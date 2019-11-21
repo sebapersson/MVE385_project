@@ -178,7 +178,7 @@ data_AFA1052 <- read_one_experiment(path_data, rows_to_read, cols_to_read, dose,
 # Experiment AFA1049NaCl
 # -------------------------------------------------------------------------------
 path_data <- "../../Data/Raw_data/Controlls_NaCl/AFA1049NaCl.xlsx"
-dose <- "NaCl_3.3mgl/kg"
+dose <- "NaCl"
 rows_to_read <- list(c(1, 18))
 cols_to_read <- list(1:13)
 position <- c("Stratium")
@@ -214,7 +214,7 @@ data_BML805_c <- read_one_experiment(path_data, rows_to_read, cols_to_read, dose
 # Experiment BML807
 # -------------------------------------------------------------------------------
 path_data <- "../../Data/Raw_data/Controlls_NaCl/BML807stri_pfc.xls"
-dose <- "NaCl_0.9_percent"
+dose <- "NaCl"
 rows_to_read <- list(c(1, 19), c(24, 42))
 cols_to_read <- list(1:13, 1:13)
 position <- c("Stratium", "Vortex")
@@ -238,7 +238,7 @@ data_BML894_c <- read_one_experiment(path_data, rows_to_read, cols_to_read, dose
 # Experiment BML1047
 # -------------------------------------------------------------------------------
 path_data <- "../../Data/Raw_data/Controlls_NaCl/BML1047stri_pfc.xlsx"
-dose <- "NaCl_0.09"
+dose <- "NaCl"
 rows_to_read <- list(c(1, 19), c(1, 19), c(23, 41), c(23, 41))
 cols_to_read <- list(1:13, 15:27, 1:13, 15:27)
 position <- c("Stratium", "Stratium", "Vortex", "Vortex")
