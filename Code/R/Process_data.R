@@ -22,8 +22,15 @@ read_one_experiment <- function(path_data, rows_to_read, cols_to_read, dose, pos
   # The different substances 
   col_names <- c("NOA", "DA", "MT_3", "NM", "HT_5", "DOPAC", "HIAA", "HVA")
 
-  # For having unique id:s
-  to_concatenate <- as.character(1:12)
+  # Fixing the to concatenate vector to create the unique idea
+  to_concatenate <- rep("A", length(position))
+  i <- 1
+  for(word in position){
+    if(str_sub(word, 1, 1) == "C") to_concatenate[i] <- "a"
+    else to_concatenate[i] <- "s"
+    i <- i + 1
+  }
+  
   
   # Read all the cases in the file 
   data_list <- lapply(1:length(rows_to_read), function(i){
