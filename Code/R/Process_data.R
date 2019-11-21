@@ -11,13 +11,14 @@ library(xlsx)
 #   dose, a string with the dosage 
 #   position, a vector with the position for each experiment 
 #   id_patient, a vector with the id for each patient
+#   n_samples, the number of samples per patient, by defult this tends to be 15 
 # Returns:
 #   a tibble with the observed data in tidy-format 
-read_one_experiment <- function(path_data, rows_to_read, cols_to_read, dose, position, id_patient, n_samples = 15)
+read_one_experiment <- function(path_data, rows_to_read, cols_to_read, dose, position, id_patient, n_samples=15)
 {
 
   # The time vector 
-  t_vec <- c(seq(from = 0, to = 20, length.out = 7), seq(from = 40, by = 20, length.out = n_samples - 7))
+  t_vec <- c(seq(from = 0, by = 20, length.out = 7), seq(from = 140, by = 20, length.out = n_samples - 7))
   # The different substances 
   col_names <- c("NOA", "DA", "MT_3", "NM", "HT_5", "DOPAC", "HIAA", "HVA")
 
@@ -165,14 +166,14 @@ data_AFA1052 <- read_one_experiment(path_data, rows_to_read, cols_to_read, dose,
 # -------------------------------------------------------------------------------
 # Experiment AFA1053
 # -------------------------------------------------------------------------------
-path_data <- "../../Data/Raw_data/CC150/AFA1052.xlsx"
+path_data <- "../../Data/Raw_data/CC150/AFA1053.xlsx"
 dose <- "CC_150.0_mumol/kg"
 rows_to_read <- list(c(1, 19), c(1, 19), c(24, 42), c(24, 42))
 cols_to_read <- list(1:13, 15:27, 1:13, 15:27)
 position <- c("Stratium", "Stratium", "Vortex", "Vortex")
-id_patient <- c("AFA1052_1", "AFA1052_2", "AFA1052_1", "AFA1052_2")
+id_patient <- c("AFA1053_1", "AFA1053_2", "AFA1053_1", "AFA1053_2")
 
-data_AFA1052 <- read_one_experiment(path_data, rows_to_read, cols_to_read, dose, position, id_patient)
+data_AFA1053 <- read_one_experiment(path_data, rows_to_read, cols_to_read, dose, position, id_patient)
 
 # -------------------------------------------------------------------------------
 # Experiment AFA1049NaCl
@@ -259,13 +260,14 @@ control_data <- data_AFA1049_c %>%
   bind_rows(data_BML894_c) %>%
   bind_rows(data_BML1047_c) %>%
   mutate(Type = "Control") %>%
+  mutate_if(is.character, as.factor) %>%
   select(id, position, sample, Type, time, everything())
 
 case_data <- data_AFA1024 %>%
   bind_rows(data_AFA1041) %>%
   bind_rows(data_AFA1042) %>%
   bind_rows(data_AFA1052) %>%
-  bind_rows(data_AFA1052) %>%
+  bind_rows(data_AFA1053) %>%
   bind_rows(data_AFA1062) %>%
   bind_rows(data_AFA1063) %>%
   bind_rows(data_AFA1067) %>%
@@ -282,3 +284,4 @@ data_tot <- case_data %>%
 # Save the data to the intermediate folder 
 path_save <- "../../Intermediate/Data_tidy.csv"
 write_csv(data_tot, path_save)
+  
