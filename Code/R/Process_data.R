@@ -62,7 +62,7 @@ path_data <- "../../Data/Raw_data/CC6/AFA1062.xlsx"
 dose <- "CC_5.6_mumol/kg"
 rows_to_read <- list(c(1, 19), c(1, 19), c(24, 42), c(24, 42))
 cols_to_read <- list(1:13, 15:27, 1:13, 15:27)
-position <- c("Stratium", "Stratium", "Vortex", "Vortex")
+position <- c("Striatum", "Striatum", "Cortex", "Cortex")
 id_patient <- c("AFA1062_1", "AFA1062_2", "AFA1062_1", "AFA1062_2")
 
 data_AFA1062 <- read_one_experiment(path_data, rows_to_read, cols_to_read, dose, position, id_patient)
@@ -74,7 +74,7 @@ path_data <- "../../Data/Raw_data/CC6/AFA1063.xlsx"
 dose <- "CC_5.6_mumol/kg"
 rows_to_read <- list(c(1, 19), c(1, 19), c(24, 42), c(24, 42))
 cols_to_read <- list(1:13, 15:27, 1:13, 15:27)
-position <- c("Stratium", "Stratium", "Vortex", "Vortex")
+position <- c("Striatum", "Striatum", "Cortex", "Cortex")
 id_patient <- c("AFA1063_1", "AFA1063_2", "AFA1063_1", "AFA1063_2")
 
 data_AFA1063 <- read_one_experiment(path_data, rows_to_read, cols_to_read, dose, position, id_patient)
@@ -86,7 +86,7 @@ path_data <- "../../Data/Raw_data/CC6/AFA1068.xlsx"
 dose <- "CC_5.6_mumol/kg"
 rows_to_read <- list(c(1, 19), c(1, 19), c(24, 42), c(24, 42))
 cols_to_read <- list(1:13, 15:27, 1:13, 15:27)
-position <- c("Stratium", "Stratium", "Vortex", "Vortex")
+position <- c("Striatum", "Striatum", "Cortex", "Cortex")
 id_patient <- c("AFA1068_1", "AFA1068_2", "AFA1068_1", "AFA1068_2")
 
 data_AFA1068 <- read_one_experiment(path_data, rows_to_read, cols_to_read, dose, position, id_patient)
@@ -98,7 +98,7 @@ path_data <- "../../Data/Raw_data/CC16/AFA1024.xlsx"
 dose <- "CC_16.7_mumol/kg"
 rows_to_read <- list(c(1, 19), c(1, 19), c(20, 38), c(20, 38))
 cols_to_read <- list(1:13, 15:27, 1:13, 15:27)
-position <- c("Stratium", "Stratium", "Vortex", "Vortex")
+position <- c("Striatum", "Striatum", "Cortex", "Cortex")
 id_patient <- c("AFA1024_1", "AFA1024_2", "AFA1024_1", "AFA1024_2")
 
 data_AFA1024 <- read_one_experiment(path_data, rows_to_read, cols_to_read, dose, position, id_patient)
@@ -110,7 +110,7 @@ path_data <- "../../Data/Raw_data/CC16/AFA1067.xlsx"
 dose <- "CC_16.7_mumol/kg"
 rows_to_read <- list(c(1, 19), c(1, 19), c(24, 42), c(24, 42))
 cols_to_read <- list(1:13, 15:27, 1:13, 15:27)
-position <- c("Stratium", "Stratium", "Vortex", "Vortex")
+position <- c("Striatum", "Striatum", "Cortex", "Cortex")
 id_patient <- c("AFA1067_1", "AFA1067_2", "AFA1067_1", "AFA1067_2")
 
 data_AFA1067 <- read_one_experiment(path_data, rows_to_read, cols_to_read, dose, position, id_patient)
@@ -122,7 +122,7 @@ path_data <- "../../Data/Raw_data/CC50/AFA1041.xlsx"
 dose <- "CC_50.0_mumol/kg"
 rows_to_read <- list(c(1, 19), c(1, 19), c(24, 42))
 cols_to_read <- list(1:13, 15:27, 1:13)
-position <- c("Stratium", "Stratium", "Vortex")
+position <- c("Striatum", "Striatum", "Cortex")
 id_patient <- c("AFA1041_1", "AFA1041_2", "AFA1041_1")
 
 data_AFA1041 <- read_one_experiment(path_data, rows_to_read, cols_to_read, dose, position, id_patient)
@@ -134,7 +134,7 @@ path_data <- "../../Data/Raw_data/CC50/AFA1042.xlsx"
 dose <- "CC_50.0_mumol/kg"
 rows_to_read <- list(c(1, 19), c(1, 19), c(24, 42), c(24, 42))
 cols_to_read <- list(1:13, 15:27, 1:13, 15:27)
-position <- c("Stratium", "Stratium", "Vortex", "Vortex")
+position <- c("Striatum", "Striatum", "Cortex", "Cortex")
 id_patient <- c("AFA1042_1", "AFA1042_2", "AFA1042_1", "AFA1042_2")
 
 data_AFA1042 <- read_one_experiment(path_data, rows_to_read, cols_to_read, dose, position, id_patient)
@@ -146,7 +146,7 @@ path_data <- "../../Data/Raw_data/CC50/LW854_stri_pfc.xls"
 dose <- "CC_50.0_mumol/kg"
 rows_to_read <- list(c(1, 20), c(1, 20), c(24, 43), c(24, 43))
 cols_to_read <- list(1:13, 15:27, 1:13, 15:27)
-position <- c("Stratium", "Stratium", "Vortex", "Vortex")
+position <- c("Striatum", "Striatum", "Cortex", "Cortex")
 id_patient <- c("LW854_1", "LW854_2", "LW854_1", "LW854_2")
 
 data_LW854 <- read_one_experiment(path_data, rows_to_read, cols_to_read, dose, position, id_patient, n_samples = 16)
@@ -158,7 +158,7 @@ path_data <- "../../Data/Raw_data/CC150/AFA1052.xlsx"
 dose <- "CC_150.0_mumol/kg"
 rows_to_read <- list(c(1, 19), c(1, 19), c(24, 42), c(24, 42))
 cols_to_read <- list(1:13, 15:27, 1:13, 15:27)
-position <- c("Stratium", "Stratium", "Vortex", "Vortex")
+position <- c("Striatum", "Striatum", "Cortex", "Cortex")
 id_patient <- c("AFA1052_1", "AFA1052_2", "AFA1052_1", "AFA1052_2")
 
 data_AFA1052 <- read_one_experiment(path_data, rows_to_read, cols_to_read, dose, position, id_patient)
@@ -170,7 +170,7 @@ path_data <- "../../Data/Raw_data/CC150/AFA1053.xlsx"
 dose <- "CC_150.0_mumol/kg"
 rows_to_read <- list(c(1, 19), c(1, 19), c(24, 42), c(24, 42))
 cols_to_read <- list(1:13, 15:27, 1:13, 15:27)
-position <- c("Stratium", "Stratium", "Vortex", "Vortex")
+position <- c("Striatum", "Striatum", "Cortex", "Cortex")
 id_patient <- c("AFA1053_1", "AFA1053_2", "AFA1053_1", "AFA1053_2")
 
 data_AFA1053 <- read_one_experiment(path_data, rows_to_read, cols_to_read, dose, position, id_patient)
@@ -182,7 +182,7 @@ path_data <- "../../Data/Raw_data/Controlls_NaCl/AFA1049NaCl.xlsx"
 dose <- "NaCl"
 rows_to_read <- list(c(1, 18))
 cols_to_read <- list(1:13)
-position <- c("Stratium")
+position <- c("Striatum")
 id_patient <- c("AFA1049_1")
 
 data_AFA1049_c <- read_one_experiment(path_data, rows_to_read, cols_to_read, dose, position, id_patient, n_samples = 14)
@@ -194,7 +194,7 @@ path_data <- "../../Data/Raw_data/Controlls_NaCl/AFA1076NaCl.xlsx"
 dose <- "NaCl"
 rows_to_read <- list(c(1, 19), c(1, 19), c(24, 42), c(24, 42))
 cols_to_read <- list(1:13, 15:27, 1:13, 15:27)
-position <- c("Stratium", "Stratium", "Vortex", "Vortex")
+position <- c("Striatum", "Striatum", "Cortex", "Cortex")
 id_patient <- c("AFA1076_1", "AFA1076_2", "AFA1076_1", "AFA1076_2")
 
 data_AFA1076_c <- read_one_experiment(path_data, rows_to_read, cols_to_read, dose, position, id_patient)
@@ -206,7 +206,7 @@ path_data <- "../../Data/Raw_data/Controlls_NaCl/BML805stri_pfc.xls"
 dose <- "NaCl"
 rows_to_read <- list(c(1, 19), c(24, 42), c(24, 42))
 cols_to_read <- list(15:27, 1:13, 15:27)
-position <- c("Stratium", "Vortex", "Vortex")
+position <- c("Striatum", "Cortex", "Cortex")
 id_patient <- c("BML805_2", "BML805_1", "BML805_2")
 
 data_BML805_c <- read_one_experiment(path_data, rows_to_read, cols_to_read, dose, position, id_patient)
@@ -218,7 +218,7 @@ path_data <- "../../Data/Raw_data/Controlls_NaCl/BML807stri_pfc.xls"
 dose <- "NaCl"
 rows_to_read <- list(c(1, 19), c(24, 42))
 cols_to_read <- list(1:13, 1:13)
-position <- c("Stratium", "Vortex")
+position <- c("Striatum", "Cortex")
 id_patient <- c("BML807_1", "BML807_1")
 
 data_BML807_c <- read_one_experiment(path_data, rows_to_read, cols_to_read, dose, position, id_patient)
@@ -230,7 +230,7 @@ path_data <- "../../Data/Raw_data/Controlls_NaCl/BML894.xlsx"
 dose <- "NaCl"
 rows_to_read <- list(c(1, 19), c(1, 19), c(24, 42), c(24, 42))
 cols_to_read <- list(1:13, 15:27, 1:13, 15:27)
-position <- c("Stratium", "Stratium", "Vortex", "Vortex")
+position <- c("Striatum", "Striatum", "Cortex", "Cortex")
 id_patient <- c("BML894_1", "BML894_2", "BML894_1", "BML894_2")
 
 data_BML894_c <- read_one_experiment(path_data, rows_to_read, cols_to_read, dose, position, id_patient)
@@ -242,7 +242,7 @@ path_data <- "../../Data/Raw_data/Controlls_NaCl/BML1047stri_pfc.xlsx"
 dose <- "NaCl"
 rows_to_read <- list(c(1, 19), c(1, 19), c(23, 41), c(23, 41))
 cols_to_read <- list(1:13, 15:27, 1:13, 15:27)
-position <- c("Stratium", "Stratium", "Vortex", "Vortex")
+position <- c("Striatum", "Striatum", "Cortex", "Cortex")
 id_patient <- c("BML1047_1", "BML1047_2", "BML1047_1", "BML1047_2")
 
 data_BML1047_c <- read_one_experiment(path_data, rows_to_read, cols_to_read, dose, position, id_patient)
