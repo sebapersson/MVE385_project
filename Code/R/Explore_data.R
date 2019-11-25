@@ -39,12 +39,12 @@ data_tidy <- read_csv(path_data, col_types = cols(
 da_150_a <- data_tidy %>% 
   filter(dose == "CC_150.0_mumol/kg" | dose == "NaCl") %>%
   select(id, position, Type, time, DA, unique_id)  %>% 
-  filter(position == "Vortex")
+  filter(position == "Cortex")
 
 da_150_s <- data_tidy %>% 
   filter(dose == "CC_150.0_mumol/kg" | dose == "NaCl") %>%
   select(id, position, Type, time, DA, unique_id)  %>% 
-  filter(position == "Stratium")
+  filter(position == "Striatum")
 
 p1 <- ggplot(da_150_a, aes(time, DA, color = Type)) + 
   geom_line(aes(group = id)) + 
@@ -72,12 +72,12 @@ ggpubr::ggarrange(p1, p2, ncol = 2)
 da_50_a <- data_tidy %>% 
   filter(dose == "CC_50.0_mumol/kg" | dose == "NaCl") %>%
   select(id, position, Type, time, DA, unique_id)  %>% 
-  filter(position == "Vortex")
+  filter(position == "Cortex")
 
 da_50_s <- data_tidy %>% 
   filter(dose == "CC_50.0_mumol/kg" | dose == "NaCl") %>%
   select(id, position, Type, time, DA, unique_id)  %>% 
-  filter(position == "Stratium")
+  filter(position == "Striatum")
 
 p1 <- ggplot(da_50_a, aes(time, DA, color = Type)) + 
   geom_line(aes(group = id)) + 
@@ -107,12 +107,12 @@ ggpubr::ggarrange(p1, p2, ncol = 2)
 noa_150_a <- data_tidy %>% 
   filter(dose == "CC_150.0_mumol/kg" | dose == "NaCl") %>%
   select(id, position, Type, time, NOA, unique_id)  %>% 
-  filter(position == "Vortex")
+  filter(position == "Cortex")
 
 noa_150_s <- data_tidy %>% 
   filter(dose == "CC_150.0_mumol/kg" | dose == "NaCl") %>%
   select(id, position, Type, time, NOA, unique_id)  %>% 
-  filter(position == "Stratium")
+  filter(position == "Striatum")
 
 p1 <- ggplot(noa_150_a, aes(time, NOA, color = Type)) + 
   geom_line(aes(group = id)) +
@@ -140,12 +140,12 @@ ggpubr::ggarrange(p1, p2, ncol = 2)
 noa_50_a <- data_tidy %>% 
   filter(dose == "CC_50.0_mumol/kg" | dose == "NaCl") %>%
   select(id, position, Type, time, NOA, unique_id)  %>% 
-  filter(position == "Vortex")
+  filter(position == "Cortex")
 
 noa_50_s <- data_tidy %>% 
   filter(dose == "CC_50.0_mumol/kg" | dose == "NaCl") %>%
   select(id, position, Type, time, NOA, unique_id)  %>% 
-  filter(position == "Stratium")
+  filter(position == "Striatum")
 
 p1 <- ggplot(noa_50_a, aes(time, NOA, color = Type)) + 
   geom_line(aes(group = id)) +
@@ -175,12 +175,12 @@ ggpubr::ggarrange(p1, p2, ncol = 2)
 ht5_150_a <- data_tidy %>% 
   filter(dose == "CC_150.0_mumol/kg" | dose == "NaCl") %>%
   select(id, position, Type, time, HT_5, unique_id)  %>% 
-  filter(position == "Vortex")
+  filter(position == "Cortex")
 
 ht5_150_s <- data_tidy %>% 
   filter(dose == "CC_150.0_mumol/kg" | dose == "NaCl") %>%
   select(id, position, Type, time, HT_5, unique_id)  %>% 
-  filter(position == "Stratium")
+  filter(position == "Striatum")
 
 p1 <- ggplot(ht5_150_a, aes(time, HT_5, color = Type)) + 
   geom_line(aes(group = id)) +
@@ -210,12 +210,12 @@ ggpubr::ggarrange(p1, p2, ncol = 2)
 ht5_50_a <- data_tidy %>% 
   filter(dose == "CC_50.0_mumol/kg" | dose == "NaCl") %>%
   select(id, position, Type, time, HT_5, unique_id)  %>% 
-  filter(position == "Vortex")
+  filter(position == "Cortex")
 
 ht5_50_s <- data_tidy %>% 
   filter(dose == "CC_50.0_mumol/kg" | dose == "NaCl") %>%
   select(id, position, Type, time, HT_5, unique_id)  %>% 
-  filter(position == "Stratium")
+  filter(position == "Striatum")
 
 p1 <- ggplot(ht5_50_a, aes(time, HT_5, color = Type)) + 
   geom_line(aes(group = id)) +
@@ -240,7 +240,7 @@ ggpubr::ggarrange(p1, p2, ncol = 2)
 # DA, summarise 
 # ------------------------------------------------------------------------------------------------
 da_sum_c <- data_tidy %>% 
-  filter(position == "Vortex") %>% 
+  filter(position == "Cortex") %>% 
   select(time, DA, dose) %>%
   group_by(time, dose) %>% 
   summarise(mean = mean(DA, na.rm = T), 
@@ -257,7 +257,7 @@ ggplot(da_sum_c, aes(time, mean, color = dose, fill = dose)) +
   my_theme
 
 da_sum_s <- data_tidy %>% 
-  filter(position == "Stratium") %>% 
+  filter(position == "Striatum") %>% 
   select(time, DA, dose) %>%
   group_by(time, dose) %>% 
   summarise(mean = mean(DA, na.rm = T), 
