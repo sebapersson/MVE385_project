@@ -269,7 +269,7 @@ ggplot(da_sum_s, aes(time, mean, color = dose, fill = dose)) +
   geom_line(size = 1.2) + 
   geom_ribbon(aes(ymin = lower_int, ymax = upper_int), alpha = 0.2, color = NA) +
   scale_color_manual(values = cbPalette[-1]) + 
-  scale_fill_manual(values = cbPalette[-1]) + (
+  scale_fill_manual(values = cbPalette[-1]) + 
   labs(title = "S-region DA different dosages") + 
   my_theme
 
