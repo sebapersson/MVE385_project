@@ -192,8 +192,29 @@ rows_to_read <- list(c(1, 18))
 cols_to_read <- list(1:13)
 position <- c("Striatum")
 id_patient <- c("AFA1049_1")
-
 data_AFA1049_c <- read_one_experiment(path_data, rows_to_read, cols_to_read, dose, position, id_patient, n_samples = 14)
+
+# Adding a hole due to missing observation 
+extra_row <- tibble(id = "AFA1049_1", 
+                    position = "Striatum", 
+                    sample = 2,
+                    time = -60, 
+                    NOA = NA, 
+                    DA = NA,
+                    MT_3 = NA, 
+                    NM = NA,
+                    HT_5 = NA, 
+                    DOPAC = NA, 
+                    HIAA = NA, 
+                    HVA = NA, 
+                    unique_id = "AFA1049_1s", 
+                    dose = "NaCl")
+lower_part <- data_AFA1049_c[1:2, ] 
+upper_part <- data_AFA1049_c[3:14, ] %>%
+  mutate(time = time + 20)
+data_AFA1049_c <- lower_part %>% 
+  bind_rows(extra_row) %>%
+  bind_rows(upper_part)
 
 # -------------------------------------------------------------------------------
 # Experiment AFA1076
