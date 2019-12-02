@@ -19,6 +19,7 @@ read_one_experiment <- function(path_data, rows_to_read, cols_to_read, dose, pos
 
   # The time vector 
   t_vec <- c(seq(from = 0, by = 20, length.out = 7), seq(from = 140, by = 20, length.out = n_samples - 7))
+  t_vec <- t_vec - rep(100, length(t_vec))
   # The different substances 
   col_names <- c("NOA", "DA", "MT_3", "NM", "HT_5", "DOPAC", "HIAA", "HVA")
 
