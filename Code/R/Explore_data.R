@@ -281,34 +281,34 @@ ggplot(da_sum_s, aes(time, mean, color = dose, fill = dose)) +
 
 noa_wide <- data_tidy
 noa_wide <- noa_wide %>%
-  select(unique_id,time,NOA) %>%
+  select(unique_id,time,NOA,position,dose) %>%
   mutate(time=paste0('noa_', time)) %>%
   spread(time, NOA) %>%
   select(unique_id, noa_0, noa_20, noa_40, noa_60, noa_80, noa_100,
         noa_120, noa_140, noa_160, noa_180, noa_200,
-        noa_220, noa_240, noa_260, noa_280, noa_300)
+        noa_220, noa_240, noa_260, noa_280, noa_300,position,dose)
 
 da_wide <- data_tidy
 da_wide <- da_wide %>%
-  select(unique_id,time,DA) %>%
+  select(unique_id,time,DA,position,dose) %>%
   mutate(time=paste0('da_', time)) %>%
   spread(time, DA) %>%
   select(unique_id, da_0, da_20, da_40, da_60, da_80, da_100,
          da_120, da_140, da_160, da_180, da_200,
-         da_220, da_240, da_260, da_280, da_300)
+         da_220, da_240, da_260, da_280, da_300,position,dose)
 
-mt_3_wide <- data_tidy
-mt_3_wide <- mt_3_wide %>%
-  select(unique_id,time,MT_3) %>%
-  mutate(time=paste0('mt_3_', time)) %>%
-  spread(time, MT_3) %>%
-  select(unique_id, mt_3_0, mt_3_20, mt_3_40, mt_3_60, mt_3_80, mt_3_100,
-         mt_3_120, mt_3_140, mt_3_160, mt_3_180, mt_3_200,
-         mt_3_220, mt_3_240, mt_3_260, mt_3_280, mt_3_300)
+ht_5_wide <- data_tidy
+ht_5_wide <- ht_5_wide %>%
+  select(unique_id,time,HT_5,position,dose) %>%
+  mutate(time=paste0('ht_5_', time)) %>%
+  spread(time, HT_5) %>%
+  select(unique_id, ht_5_0, ht_5_20, ht_5_40, ht_5_60, ht_5_80, ht_5_100,
+         ht_5_120, ht_5_140, ht_5_160, ht_5_180, ht_5_200,
+         ht_5_220, ht_5_240, ht_5_260, ht_5_280, ht_5_300,position,dose)
 
 
 # View rows with any NAs from 20, 40, ..., 280 minutes
 
 noa_wide[rowSums(is.na(noa_wide[,seq(3,16)])) > 0,]
 da_wide[rowSums(is.na(da_wide[,seq(3,16)])) > 0,]
-mt_3_wide[rowSums(is.na(mt_3_wide[,seq(3,16)])) > 0,]
+ht_5_wide[rowSums(is.na(ht_5_wide[,seq(3,16)])) > 0,]
