@@ -355,3 +355,67 @@ data_big <- inner_join(data_tot, data_baseline, by = "unique_id") %>%
 path_save <- "../../Intermediate/Data_tidy.csv"
 write_csv(data_big, path_save)
 
+# -------------------------------------------------------------------------------
+# Aggregate the data into time-zones 
+# -------------------------------------------------------------------------------
+# Only the relevant molecules will be included in the aggregated data set, 
+# however adding a new molecule should not be complicated given the code below 
+# as it is just to add an extra molecule in the select step 
+data_relevant <- data_big %>%
+  select(position, Type, time, NOA, DA, HT_5, unique_id, dose, 
+         baseline_NOA, baseline_DA, baseline_HT_5, b_NOA, b_DA, b_HT_5) %>%
+  select(unique_id, position, Type, time, NOA, b_NOA, DA, b_DA, HT_5, b_HT_5, everything())
+  
+data_first <- data_relevant %>%
+  filter(time == 20 | time == 40 | time == 60) %>%
+  mutate(time = 1) %>%
+  group_by(unique_id, position, Type, time) %>%
+  summarise(NOA = mean(NOA, na.rm = T), 
+            b_NOA = mean(b_NOA, na.rm = T), 
+            DA = mean(DA, na.rm = T), 
+            b_DA = mean(b_DA, na.rm = T), 
+            HT_5 = mean(HT_5, na.rm = T), 
+            b_HT_5 = mean(b_HT_5, na.rm = T), 
+            base_DA = mean(baseline_DA, na.rm = T),
+            base_NOA = mean(baseline_NOA, na.rm = T), 
+            base_HT_5 = mean(baseline_HT_5))
+
+data_middle <- data_relevant %>%   
+  filter(time == 80 | time == 100 | time == 120) %>%
+  mutate(time = 2) %>%
+  group_by(unique_id, position, Type, time) %>%
+  summarise(NOA = mean(NOA, na.rm = T), 
+            b_NOA = mean(b_NOA, na.rm = T), 
+            DA = mean(DA, na.rm = T), 
+            b_DA = mean(b_DA, na.rm = T), 
+            HT_5 = mean(HT_5, na.rm = T), 
+            b_HT_5 = mean(b_HT_5, na.rm = T), 
+            base_DA = mean(baseline_DA, na.rm = T),
+            base_NOA = mean(baseline_NOA, na.rm = T), 
+            base_HT_5 = mean(baseline_HT_5))
+
+data_last <- data_relevant %>%
+  filter(time == 140 | time == 160 | time == 180) %>%
+  mutate(time = 3) %>%
+  group_by(unique_id, position, Type, time) %>%
+  summarise(NOA = mean(NOA, na.rm = T), 
+            b_NOA = mean(b_NOA, na.rm = T), 
+            DA = mean(DA, na.rm = T), 
+            b_DA = mean(b_DA, na.rm = T), 
+            HT_5 = mean(HT_5, na.rm = T), 
+            b_HT_5 = mean(b_HT_5, na.rm = T), 
+            base_DA = mean(baseline_DA, na.rm = T),
+            base_NOA = mean(baseline_NOA, na.rm = T), 
+            base_HT_5 = mean(baseline_HT_5))
+
+# Aggreate the data
+data_aggregate <- data_first %>% bind_rows(data_middle) %>% bind_rows(data_last)
+
+# Sort the columns by first unique id and then by time 
+i_rows <- order(data_aggregate$unique_id, data_aggregate$time)
+data_aggregate_final <- data_aggregate[i_rows, ]
+
+# Writing the data to file 
+path_save <- "../../Intermediate/Data_tidy_agg.csv"
+write_csv(data_aggregate_final, path_save)
+
