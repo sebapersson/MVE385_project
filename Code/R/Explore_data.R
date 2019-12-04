@@ -12,7 +12,7 @@ cbPalette <- c(
   "#999999", "#E69F00", "#56B4E9", "#009E73",
   "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
-# For certain kind of plots 
+# For plots were conditions have an ordering 
 my_palette <- brewer.pal(n = 9, name = "GnBu")[-c(1, 2, 3)]
 
 DOSE_START <- 0
@@ -53,6 +53,8 @@ data_tidy$dose <- dose_ordered
 # ================================================================================================
 # Start of functions 
 # ================================================================================================
+
+
 # Function that will for a certain dosage and molecule plot the time series for each individual. 
 # Note that the data won't be scaled by baseline 
 # Args:
@@ -100,6 +102,7 @@ plot_individuals_non_scaled <- function(data_tidy, specie, dose_input, specie_na
   
   ggpubr::ggarrange(p1, p2, ncol = 2, common.legend = T, legend = "bottom")
 }
+
 
 # Function that will plot summarised data for a certain spece. 
 # TODO: This function will in the future
@@ -163,6 +166,127 @@ plot_summarised_data <- function(data_tidy, specie, specie_name)
   ggpubr::ggarrange(p1, p2, ncol = 2, common.legend = T, legend = "bottom")
 }
 
+
+# Function that will plot the number of observations for a certain dose with and without 
+# missing values. The purpose of this test is to find the number of observations that 
+# are lost using an ANOVA-test 
+# Args:
+#   specie, the molecule of interest
+#   specie_name, the name of the specie
+# Returns:
+#   void 
+plot_missing_values <- function(specie, specie_name)
+{
+  
+  # Calculate number of missing values 
+  data_missing <- data_tidy %>%
+    select(position, time, unique_id, specie) %>%
+    filter(time > -60) %>%
+    filter(time != 200) 
+  # For the tidyverse (and ggplot) to work
+  names(data_missing)[4] <- "specie"
+  data_missing <- data_missing %>%
+    group_by(unique_id) %>%
+    summarise(number_na = sum(is.na(specie)))
+  
+  # The id if more (or equal) to 10 observations are missing 
+  missing_many <- data_missing %>%
+    filter(number_na >= 10) %>%
+    select(unique_id)
+  
+  # The id if no observations are missing 
+  data_no_missing <- data_missing %>%
+    filter(number_na == 0) %>%
+    select(unique_id)
+  
+  # Aggregate number of individuals with missing (but less than 10)
+  data_with_missing <- data_tidy %>%
+    filter(time > -60 & time != 200) %>%
+    filter(!(unique_id %in% missing_many$unique_id)) %>%
+    mutate(time = as.factor(time)) %>%
+    group_by(dose, position) %>%
+    summarise(count = length(unique(unique_id)))
+  
+  # Aggreate number of samples with no missing 
+  data_without_missing <- data_tidy %>%
+    filter(time > -60 & time != 200) %>%
+    filter(unique_id %in% data_no_missing$unique_id) %>%
+    mutate(time = as.factor(time)) %>%
+    group_by(dose, position) %>%
+    summarise(count = length(unique(unique_id)))
+  
+  title <- str_c(specie_name, " with NA-values")
+  p1 <- ggplot(data_with_missing, aes(position, count, fill = dose)) + 
+    geom_bar(stat = "identity", position = "dodge") + 
+    scale_fill_manual(values = cbPalette[-1]) + 
+    labs(title = title, x = "", y = "Number of samples") + 
+    ylim(0, 10) + 
+    my_theme
+  
+  title <- str_c(specie_name, " without NA-values")
+  p2 <- ggplot(data_without_missing, aes(position, count, fill = dose)) + 
+    geom_bar(stat = "identity", position = "dodge") + 
+    scale_fill_manual(values = cbPalette[-1]) + 
+    labs(title = title, x = "", y = "Number of samples") +
+    ylim(0, 10) + 
+    my_theme
+  
+  ggpubr::ggarrange(p1, p2, ncol = 2, common.legend = T, legend = "bottom")
+}
+
+
+# Function that plots the missing values over time for a certain individual, this is in order 
+# to see that the missing values aren't accumulated at a certain location. 
+# Args:
+#   specie, the molecule of interest
+#   specie_name, the name of the specie
+# Returns:
+#   void 
+plot_dist_missing_values <- function(specie, specie_name)
+{
+  # Calculate number of missing values 
+  data_missing <- data_tidy %>%
+    select(position, time, unique_id, specie) %>%
+    filter(time > -60) %>%
+    filter(time != 200) 
+  # For the tidyverse (and ggplot) to work
+  names(data_missing)[4] <- "specie"
+  data_missing <- data_missing %>%
+    group_by(unique_id) %>%
+    summarise(number_na = sum(is.na(specie)))
+  
+  # The id if more (or equal) to 10 observations are missing 
+  missing_many <- data_missing %>%
+    filter(number_na >= 10) %>%
+    select(unique_id)
+  
+  # Select id:s to plot
+  id_to_check <- data_missing %>%
+    filter(!(unique_id %in% missing_many$unique_id)) %>%
+    filter(number_na != 0) %>%
+    select(unique_id)
+  
+  # Fix the data in a manner it can be plotted in 
+  data_to_plot <- data_tidy %>%
+    filter(time > -60) %>% 
+    filter(time != 200) %>%
+    filter(unique_id %in% id_to_check$unique_id) %>%
+    select(time, position, unique_id, specie)
+  # For the tidyverse to work 
+  names(data_to_plot)[4] <- "specie"
+  data_to_plot <- data_to_plot %>%
+    mutate(value = case_when(specie > 0 ~ 0, 
+                             is.na(specie) ~ 1)) %>%
+    mutate(time = as.factor(time))
+  
+  title <- str_c(specie_name, " distribution missing values")
+  ggplot(data_to_plot, aes(time, value, fill = unique_id)) +
+    geom_bar(stat = "identity") + 
+    scale_fill_viridis_d() + 
+    labs(title = title, x = "Time", y = "") + 
+    my_theme + theme(legend.title = element_blank())
+}
+
 # ================================================================================================
 # Plotting over time for different indiviuals and different doses (and regions)
 # ================================================================================================
@@ -216,21 +340,33 @@ plot_individuals_non_scaled(data_tidy, molecule, dose, specie_name, dose_name)
 molecule <- "DA"
 specie_name = "Dopamin"
 plot_summarised_data(data_tidy, molecule, specie_name)
+# Dopamin summarised data baseline
+molecule <- "b_DA"
+specie_name = "Dopamin Baseline"
+plot_summarised_data(data_tidy, molecule, specie_name)
 
 # NOA summarised data 
 molecule <- "NOA"
 specie_name = "NOA"
+plot_summarised_data(data_tidy, molecule, specie_name)
+# NOA summarised data baseline
+molecule <- "b_NOA"
+specie_name = "NOA baseline"
 plot_summarised_data(data_tidy, molecule, specie_name)
 
 # HT_5 summarised data
 molecule <- "HT_5"
 specie_name = "HT-5"
 plot_summarised_data(data_tidy, molecule, specie_name)
+# HT_5 summarised data baseline
+molecule <- "b_HT_5"
+specie_name = "HT-5 baseline"
+plot_summarised_data(data_tidy, molecule, specie_name)
 
 # ------------------------------------------------------------------------------------------------
 # Missing values
 # ------------------------------------------------------------------------------------------------
-
+# TODO: Consider removing the wide-data format 
 # Convert to wide format
 noa_wide <- data_tidy
 noa_wide <- noa_wide %>%
@@ -265,25 +401,26 @@ dim(noa_wide[rowSums(is.na(noa_wide[,seq(3,16)])) > 0,])[1]
 dim(da_wide[rowSums(is.na(da_wide[,seq(3,16)])) > 0,])
 dim(ht_5_wide[rowSums(is.na(ht_5_wide[,seq(3,16)])) > 0,])
 
-# ----------------------------------------------------------------------------------------------
-# Quanitfying the number of missing values 
-# ----------------------------------------------------------------------------------------------
-data_missing <- data_tidy %>%
-  select(position, time, unique_id, NOA, DA, HT_5) %>%
-  filter(time > -60) %>%
-  filter(time != 200) %>%
-  group_by(unique_id) %>%
-  summarise(number_na_noa = sum(is.na(NOA)), 
-            number_na_da = sum(is.na(DA)), 
-            number_na_ht = sum(is.na(HT_5)))
+# ================================================================================================
+# Quantifaying the number of missing values 
+# ================================================================================================
+# For NOA
+specie <- "NOA"
+specie_name <- "NOA"
+plot_missing_values(specie, specie_name)
+plot_dist_missing_values(specie, specie_name)
 
-missing_noa <- data_missing %>%
-  filter(number_na_noa >= 10) %>%
-  select(unique_id)
+# For DA
+specie <- "DA"
+specie_name <- "Dopamin"
+plot_missing_values(specie, specie_name)
+plot_dist_missing_values(specie, specie_name)
 
-data_no_missing_noa <- data_missing %>%
-  filter(number_na_noa == 0) %>%
-  select(unique_id)
+# HT-5
+specie <- "HT_5"
+specie_name <- "HT-5"
+plot_missing_values(specie, specie_name)
+plot_dist_missing_values(specie, specie_name)
 
 # For NOA we will drop (more than 10 missing values), only drop for NOA 
 # AFA1041_1s
@@ -296,186 +433,3 @@ data_no_missing_noa <- data_missing %>%
 # LW854_1s  
 # BML894_1s 
 # BML1047_2s
-
-data_sum_noa <- data_tidy %>%
-  filter(time > -60 & time != 200) %>%
-  filter(!(unique_id %in% missing_noa$unique_id)) %>%
-  mutate(time = as.factor(time)) %>%
-  group_by(dose, position) %>%
-  summarise(count = length(unique(unique_id)))
-
-
-p1 <- ggplot(data_sum_noa, aes(position, count, fill = dose)) + 
-  geom_bar(stat = "identity", position = "dodge") + 
-  scale_fill_manual(values = cbPalette[-1]) + 
-  labs(title = "NOA with NA") + 
-  ylim(0, 10) + 
-  my_theme
-
-data_complete_noa <- data_tidy %>%
-  filter(time > -60 & time != 200) %>%
-  filter(unique_id %in% data_no_missing_noa$unique_id) %>%
-  mutate(time = as.factor(time)) %>%
-  group_by(dose, position) %>%
-  summarise(count = length(unique(unique_id)))
-
-p2 <- ggplot(data_complete_noa, aes(position, count, fill = dose)) + 
-  geom_bar(stat = "identity", position = "dodge") + 
-  scale_fill_manual(values = cbPalette[-1]) + 
-  labs(title = "NOA without NA") +
-  ylim(0, 10) + 
-  my_theme
-  
-ggpubr::ggarrange(p1, p2, ncol = 2)
-
-# ---------------------------------------------------------------------------------------------
-# NA-check for NOA 
-# ---------------------------------------------------------------------------------------------
-id_to_check_noa <- data_missing %>%
-  filter(!(unique_id %in% missing_noa$unique_id)) %>%
-  filter(number_na_noa != 0) %>%
-  select(unique_id)
-
-data_to_plot <- data_tidy %>%
-  filter(time > -60) %>% 
-  filter(time != 200) %>%
-  filter(unique_id %in% id_to_check_noa$unique_id) %>%
-  select(time, position, unique_id, NOA) %>%
-  mutate(value = case_when(NOA > 0 ~ 0, 
-                           is.na(NOA) ~ 1)) %>%
-  mutate(time = as.factor(time))
-  
-
-ggplot(data_to_plot, aes(time, value, fill = unique_id)) +
-  geom_bar(stat = "identity") + 
-  scale_fill_manual(values = cbPalette) + 
-  labs(title = "NOA missing values", x = "Time") + 
-  my_theme
-
-# ---------------------------------------------------------------------------------------------
-# NA-check for DA 
-# ---------------------------------------------------------------------------------------------
-id_to_check_da <- data_missing %>%
-  filter(number_na_da != 0) %>%
-  select(unique_id)
-
-data_to_plot <- data_tidy %>%
-  filter(time > -60) %>%
-  filter(time != 200) %>%
-  filter(unique_id %in% id_to_check_da$unique_id) %>%
-  select(time, position, unique_id, DA) %>%
-  mutate(value = case_when(DA > 0 ~ 0, 
-                           is.na(DA) ~ 1)) %>%
-  mutate(time = as.factor(time))
-
-ggplot(data_to_plot, aes(time, value, fill = unique_id)) +
-  geom_bar(stat = "identity") + 
-  scale_fill_brewer(palette = "Paired") + 
-  labs(title = "DA missing values", x = "Time") + 
-  my_theme
-
-# Making the bar-graphs 
-data_da_with_na <- data_tidy %>%
-  filter(time > -60 & time != 200) %>%
-  mutate(time = as.factor(time)) %>%
-  group_by(dose, position) %>%
-  summarise(count = length(unique(unique_id)))
-
-p1 <- ggplot(data_da_with_na, aes(position, count, fill = dose)) + 
-  geom_bar(stat = "identity", position = "dodge") + 
-  scale_fill_manual(values = cbPalette[-1]) + 
-  labs(title = "DA with NA") +
-  ylim(0, 10) + 
-  my_theme
-
-data_no_missing_da <- data_missing %>%
-  filter(number_na_da == 0) %>%
-  select(unique_id)
-
-data_complete_da <- data_tidy %>%
-  filter(time > -60 & time != 200) %>%
-  filter(unique_id %in% data_no_missing_da$unique_id) %>%
-  mutate(time = as.factor(time)) %>%
-  group_by(dose, position) %>%
-  summarise(count = length(unique(unique_id)))
-
-p2 <- ggplot(data_complete_da, aes(position, count, fill = dose)) + 
-  geom_bar(stat = "identity", position = "dodge") + 
-  scale_fill_manual(values = cbPalette[-1]) + 
-  labs(title = "DA without NA") +
-  ylim(0, 10) + 
-  my_theme
-
-
-ggpubr::ggarrange(p1, p2, ncol = 2)
-
-# ---------------------------------------------------------------------------------------------
-# HT_5 checking 
-# ---------------------------------------------------------------------------------------------
-id_to_check_ht <- data_missing %>%
-  filter(number_na_ht != 0) %>%
-  select(unique_id)
-
-data_to_plot <- data_tidy %>%
-  filter(time > -60) %>%
-  filter(time != 200) %>%
-  filter(unique_id %in% id_to_check_ht$unique_id) %>%
-  select(time, position, unique_id, HT_5) %>%
-  mutate(value = case_when(HT_5 > 0 ~ 0, 
-                           is.na(HT_5) ~ 1)) %>%
-  mutate(time = as.factor(time))
-
-ggplot(data_to_plot, aes(time, value, fill = unique_id)) +
-  geom_bar(stat = "identity") + 
-  scale_fill_viridis_d() + 
-  labs(title = "HT_5 missing values", x = "Time") + 
-  my_theme
-
-# Making the bar-graphs 
-data_da_with_ht5 <- data_tidy %>%
-  filter(time > -60 & time != 200) %>%
-  mutate(time = as.factor(time)) %>%
-  group_by(dose, position) %>%
-  summarise(count = length(unique(unique_id)))
-
-p1 <- ggplot(data_da_with_ht5, aes(position, count, fill = dose)) + 
-  geom_bar(stat = "identity", position = "dodge") + 
-  scale_fill_manual(values = cbPalette[-1]) + 
-  labs(title = "HT_5 with NA") +
-  ylim(0, 10) + 
-  my_theme
-
-data_no_missing_ht5 <- data_missing %>%
-  filter(number_na_ht == 0) %>%
-  select(unique_id)
-
-data_complete_ht5 <- data_tidy %>%
-  filter(time > -60 & time != 200) %>%
-  filter(unique_id %in% data_no_missing_ht5$unique_id) %>%
-  mutate(time = as.factor(time)) %>%
-  group_by(dose, position) %>%
-  summarise(count = length(unique(unique_id)))
-
-p2 <- ggplot(data_complete_ht5, aes(position, count, fill = dose)) + 
-  geom_bar(stat = "identity", position = "dodge") + 
-  scale_fill_manual(values = cbPalette[-1]) + 
-  labs(title = "HT_5 without NA") +
-  ylim(0, 10) + 
-  my_theme
-
-ggpubr::ggarrange(p1, p2, ncol = 2)
-
-# ---------------------------------------------------------------------------------------------
-# Fix base-line 
-# ---------------------------------------------------------------------------------------------
-
-
-max(test$b_DA, na.rm = T)
-min(test$b_DA, na.rm = T)
-
-
-
-
-
-
-
