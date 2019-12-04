@@ -1,5 +1,6 @@
 library(tidyverse)
 library(latex2exp)
+library(RColorBrewer)
 
 # General parameters for making good looking plots 
 my_theme <- theme_bw() + theme(plot.title = element_text(hjust = 0.5, size = 14, face="bold"), 
@@ -10,6 +11,9 @@ my_theme <- theme_bw() + theme(plot.title = element_text(hjust = 0.5, size = 14,
 cbPalette <- c(
   "#999999", "#E69F00", "#56B4E9", "#009E73",
   "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+
+# For certain kind of plots 
+my_palette <- brewer.pal(n = 9, name = "GnBu")[-c(1, 2, 3)]
 
 DOSE_START <- 0
 
@@ -31,6 +35,14 @@ data_tidy <- read_csv(path_data, col_types = cols(
   HVA = col_double(), 
   unique_id = col_factor(), 
   dose = col_factor()))
+
+# Refactor dose (to make sense when plotting)
+dose_ordered <- fct_relevel(data_tidy$dose, "NaCl", after = 0) %>%
+  fct_relevel("CC_5.6_mumol/kg", after = 1) %>%
+  fct_relevel("CC_16.7_mumol/kg", after = 2) %>%
+  fct_relevel("CC_50.0_mumol/kg", after = 3) %>%
+  fct_relevel("CC_150.0_mumol/kg", after = 4)
+data_tidy$dose <- dose_ordered
 
 # ================================================================================================
 # Start of functions 
@@ -83,6 +95,68 @@ plot_individuals_non_scaled <- function(data_tidy, specie, dose_input, specie_na
   ggpubr::ggarrange(p1, p2, ncol = 2)
 }
 
+# Function that will plot summarised data for a certain spece. 
+# TODO: This function will in the future
+# be extended to handle base-line corrected data.
+# Args:
+#   data_tidy, the data set in tidy format 
+#   specie, the specie to plot
+#   specie_name, the name of the specie
+# Returns:
+#   void 
+plot_summarised_data <- function(data_tidy, specie, specie_name)
+{
+  
+  data_sum_c <- data_tidy %>% 
+    filter(position == "Cortex") %>% 
+    select(time, specie, dose)
+  
+  # To avoid errors with dplyr
+  names(data_sum_c)[2] <- "specie"
+  
+  # Compute spread and mean   
+  data_sum_c <- data_sum_c %>%
+    group_by(time, dose) %>% 
+    summarise(mean = mean(specie, na.rm = T), 
+              sd = sd(specie, na.rm = T)) %>% 
+    mutate(lower_int = mean - sd) %>%
+    mutate(upper_int = mean + sd) %>%
+    rename("Dose" = "dose")
+  
+  data_sum_s <- data_tidy %>% 
+    filter(position == "Striatum") %>% 
+    select(time, specie, dose)
+  
+  names(data_sum_s)[2] <- "specie"
+  data_sum_s <- data_sum_s %>%
+    group_by(time, dose) %>% 
+    summarise(mean = mean(specie, na.rm = T), 
+              sd = sd(specie, na.rm = T)) %>% 
+    mutate(lower_int = mean - sd) %>%
+    mutate(upper_int = mean + sd) %>%
+    rename("Dose" = "dose")
+  
+  title = str_c(specie_name, " cortex different dosages")
+  p1 <-  ggplot(data_sum_c, aes(time, mean, color = Dose, fill = Dose)) + 
+    geom_line(size = 1.2) + 
+    geom_ribbon(aes(ymin = lower_int, ymax = upper_int), alpha = 0.2, color = NA) + 
+    scale_color_manual(values = my_palette) +
+    scale_fill_manual(values = my_palette) +
+    labs(title = title, y = specie_name, x = "Time [min]") + 
+    my_theme + theme(legend.title = element_blank())
+  
+  title = str_c(specie_name, " striatium different dosages")
+  p2 <- ggplot(data_sum_s, aes(time, mean, color = Dose, fill = Dose)) + 
+    geom_line(size = 1.2) + 
+    geom_ribbon(aes(ymin = lower_int, ymax = upper_int), alpha = 0.2, color = NA) +
+    scale_color_manual(values = my_palette) +
+    scale_fill_manual(values = my_palette) +
+    labs(title = title, y = specie_name, x = "Time [min]") +
+    my_theme + theme(legend.title = element_blank())
+  
+  ggpubr::ggarrange(p1, p2, ncol = 2, common.legend = T, legend = "bottom")
+}
+
 # ================================================================================================
 # Plotting over time for different indiviuals and different doses (and regions)
 # ================================================================================================
@@ -127,42 +201,25 @@ dose <- "CC_50.0_mumol/kg"
 specie_name = "HT 5"; dose_name <- "CC 50"
 plot_individuals_non_scaled(data_tidy, molecule, dose, specie_name, dose_name)
 
-# ------------------------------------------------------------------------------------------------
-# DA, summarise 
-# ------------------------------------------------------------------------------------------------
-da_sum_c <- data_tidy %>% 
-  filter(position == "Cortex") %>% 
-  select(time, DA, dose) %>%
-  group_by(time, dose) %>% 
-  summarise(mean = mean(DA, na.rm = T), 
-            sd = sd(DA, na.rm = T)) %>% 
-  mutate(lower_int = mean - sd) %>%
-  mutate(upper_int = mean + sd)
 
-ggplot(da_sum_c, aes(time, mean, color = dose, fill = dose)) + 
-  geom_line(size = 1.2) + 
-  geom_ribbon(aes(ymin = lower_int, ymax = upper_int), alpha = 0.2, color = NA)
-  scale_color_manual(values = cbPalette[-1]) + 
-  scale_fill_manual(values = cbPalette[-1]) + 
-  labs(title = "Cortex DA different dosages") + 
-  my_theme
+# ================================================================================================
+# Plotting summarised data 
+# ================================================================================================
 
-da_sum_s <- data_tidy %>% 
-  filter(position == "Striatum") %>% 
-  select(time, DA, dose) %>%
-  group_by(time, dose) %>% 
-  summarise(mean = mean(DA, na.rm = T), 
-            sd = sd(DA, na.rm = T)) %>% 
-  mutate(lower_int = mean - sd) %>%
-  mutate(upper_int = mean + sd)
+# Dopamin summarised data 
+molecule <- "DA"
+specie_name = "Dopamin"
+plot_summarised_data(data_tidy, molecule, specie_name)
 
-ggplot(da_sum_s, aes(time, mean, color = dose, fill = dose)) + 
-  geom_line(size = 1.2) + 
-  geom_ribbon(aes(ymin = lower_int, ymax = upper_int), alpha = 0.2, color = NA) +
-  scale_color_manual(values = cbPalette[-1]) + 
-  scale_fill_manual(values = cbPalette[-1]) + 
-  labs(title = "S-region DA different dosages") + 
-  my_theme
+# NOA summarised data 
+molecule <- "NOA"
+specie_name = "NOA"
+plot_summarised_data(data_tidy, molecule, specie_name)
+
+# HT_5 summarised data
+molecule <- "HT_5"
+specie_name = "HT-5"
+plot_summarised_data(data_tidy, molecule, specie_name)
 
 # ------------------------------------------------------------------------------------------------
 # Missing values
