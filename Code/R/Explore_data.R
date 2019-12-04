@@ -32,209 +32,100 @@ data_tidy <- read_csv(path_data, col_types = cols(
   unique_id = col_factor(), 
   dose = col_factor()))
 
-# ------------------------------------------------------------------------------------------------
-# Dopamin, case vs control dosages, 150 
-# ------------------------------------------------------------------------------------------------
+# ================================================================================================
+# Start of functions 
+# ================================================================================================
+# Function that wil for a certain dosage and molecule plot the time series for each individual. 
+# Note that the data won't be scaled by baseline 
+# Args:
+#   data_tidy, the data set in tidy format 
+#   specie, the specie to plot
+#   dose, the relevant dosage
+#   specie_name, the name of the specie (with dose)
+#   dose_name, dosage name (for the title)
+# Returns:
+#   void 
+plot_individuals_non_scaled <- function(data_tidy, specie, dose_input, specie_name, dose_name)
+{
+  data_150_a <- data_tidy %>% 
+    filter(dose == dose_input | dose == "NaCl") %>%
+    select(id, position, Type, time, molecule, unique_id)  %>% 
+    filter(position == "Cortex")
+  
+  data_150_s <- data_tidy %>% 
+    filter(dose == dose_input | dose == "NaCl") %>%
+    select(id, position, Type, time, DA, unique_id)  %>% 
+    filter(position == "Striatum")
+  
+  # Required by gg-plot in order to plot 
+  names(data_150_a)[5] <- "specie"
+  names(data_150_s)[5] <- "specie"
+  
+  ylab <- specie
+  title <- str_c(specie_name, " ", dose_name, " a")
+  p1 <- ggplot(data_150_a, aes(time, specie, color = Type)) + 
+    geom_line(aes(group = id)) + 
+    geom_point() + 
+    geom_vline(xintercept = DOSE_START, linetype = 2) + 
+    scale_color_manual(values = cbPalette[-1]) + 
+    labs(title = title, x = "Time [min]", y = specie_name) + 
+    my_theme
+  
+  title <- str_c(specie_name, " ", dose_name, " s")
+  p2 <- ggplot(data_150_s, aes(time, specie, color = Type)) + 
+    geom_line(aes(group = id)) + 
+    geom_point() + 
+    geom_vline(xintercept = DOSE_START, linetype = 2) + 
+    scale_color_manual(values = cbPalette[-1]) + 
+    labs(title = title, x = "Time [min]", y = specie) + 
+    my_theme
+  
+  ggpubr::ggarrange(p1, p2, ncol = 2)
+}
 
-da_150_a <- data_tidy %>% 
-  filter(dose == "CC_150.0_mumol/kg" | dose == "NaCl") %>%
-  select(id, position, Type, time, DA, unique_id)  %>% 
-  filter(position == "Cortex")
+# ================================================================================================
+# Plotting over time for different indiviuals and different doses (and regions)
+# ================================================================================================
 
-da_150_s <- data_tidy %>% 
-  filter(dose == "CC_150.0_mumol/kg" | dose == "NaCl") %>%
-  select(id, position, Type, time, DA, unique_id)  %>% 
-  filter(position == "Striatum")
+# Dopamin, case vs control dosages, CC150 
+molecule <- "DA"
+dose <- "CC_150.0_mumol/kg"
+specie_name = "Dopamin"; dose_name <- "CC 150"
+plot_individuals_non_scaled(data_tidy, molecule, dose, specie_name, dose_name)
 
-p1 <- ggplot(da_150_a, aes(time, DA, color = Type)) + 
-  geom_line(aes(group = id)) + 
-  geom_point() + 
-  geom_vline(xintercept = DOSE_START, linetype = 2) + 
-  scale_color_manual(values = cbPalette[-1]) + 
-  labs(title = "Dopamin 150 a") + 
-  my_theme
-
-p2 <- ggplot(da_150_s, aes(time, DA, color = Type)) + 
-  geom_line(aes(group = id)) + 
-  geom_point() + 
-  geom_vline(xintercept = DOSE_START, linetype = 2) + 
-  scale_color_manual(values = cbPalette[-1]) + 
-  labs(title = "Dopamin 150 s") + 
-  my_theme
-
-ggpubr::ggarrange(p1, p2, ncol = 2)
-
-
-# ------------------------------------------------------------------------------------------------
-# Dopamin, case vs control dosages 
-# ------------------------------------------------------------------------------------------------
-
-da_50_a <- data_tidy %>% 
-  filter(dose == "CC_50.0_mumol/kg" | dose == "NaCl") %>%
-  select(id, position, Type, time, DA, unique_id)  %>% 
-  filter(position == "Cortex")
-
-da_50_s <- data_tidy %>% 
-  filter(dose == "CC_50.0_mumol/kg" | dose == "NaCl") %>%
-  select(id, position, Type, time, DA, unique_id)  %>% 
-  filter(position == "Striatum")
-
-p1 <- ggplot(da_50_a, aes(time, DA, color = Type)) + 
-  geom_line(aes(group = id)) + 
-  geom_point() + 
-  geom_vline(xintercept = DOSE_START, linetype = 20) + 
-  scale_color_manual(values = cbPalette[-1]) + 
-  labs(title = "Dopamin 50 a") + 
-  my_theme
-
-p2 <- ggplot(da_50_s, aes(time, DA, color = Type)) + 
-  geom_line(aes(group = id)) + 
-  geom_point() + 
-  geom_vline(xintercept = DOSE_START, linetype = 20) + 
-  scale_color_manual(values = cbPalette[-1]) + 
-  labs(title = "Dopamin 50 s") + 
-  my_theme
-
-ggpubr::ggarrange(p1, p2, ncol = 2)
-
+# Dopamin, case vs control dosages, CC50 
+molecule <- "DA"
+dose <- "CC_50.0_mumol/kg"
+specie_name = "Dopamin"; dose_name <- "CC 50"
+plot_individuals_non_scaled(data_tidy, molecule, dose, specie_name, dose_name)
+# Note DA:
 # Significant difference high dosage for cortex (bencmark test)
-# No appearent difference regarding s-region 
 
-# ------------------------------------------------------------------------------------------------
-# NOA, case vs control dosages, 150 
-# ------------------------------------------------------------------------------------------------
+# NOA, case vs control dosages, CC150 
+molecule <- "NOA"
+dose <- "CC_150.0_mumol/kg"
+specie_name = "NOA"; dose_name <- "CC 150"
+plot_individuals_non_scaled(data_tidy, molecule, dose, specie_name, dose_name)
 
-noa_150_a <- data_tidy %>% 
-  filter(dose == "CC_150.0_mumol/kg" | dose == "NaCl") %>%
-  select(id, position, Type, time, NOA, unique_id)  %>% 
-  filter(position == "Cortex")
+# NOA, case vs control dosages, CC50 
+molecule <- "NOA"
+dose <- "CC_50.0_mumol/kg"
+specie_name = "NOA"; dose_name <- "CC 50"
+plot_individuals_non_scaled(data_tidy, molecule, dose, specie_name, dose_name)
+# Note NOA:
+# cortex significant, bigger scale than s, s-region not significant
 
-noa_150_s <- data_tidy %>% 
-  filter(dose == "CC_150.0_mumol/kg" | dose == "NaCl") %>%
-  select(id, position, Type, time, NOA, unique_id)  %>% 
-  filter(position == "Striatum")
+# HT_5, case vs control dosages, CC150 
+molecule <- "HT_5"
+dose <- "CC_150.0_mumol/kg"
+specie_name = "HT 5"; dose_name <- "CC 150"
+plot_individuals_non_scaled(data_tidy, molecule, dose, specie_name, dose_name)
 
-p1 <- ggplot(noa_150_a, aes(time, NOA, color = Type)) + 
-  geom_line(aes(group = id)) +
-  geom_point() + 
-  geom_vline(xintercept = DOSE_START, linetype = 2) + 
-  scale_color_manual(values = cbPalette[-1]) + 
-  labs(title = "NOA 150 a") + 
-  my_theme
-
-p2 <- ggplot(noa_150_s, aes(time, NOA, color = Type)) + 
-  geom_line(aes(group = id)) + 
-  geom_point() + 
-  geom_vline(xintercept = DOSE_START, linetype = 2) + 
-  scale_color_manual(values = cbPalette[-1]) + 
-  labs(title = "NOA 150 s") + 
-  my_theme
-
-ggpubr::ggarrange(p1, p2, ncol = 2)
-
-
-# ------------------------------------------------------------------------------------------------
-# NOA, case vs control dosages, 50 
-# ------------------------------------------------------------------------------------------------
-
-noa_50_a <- data_tidy %>% 
-  filter(dose == "CC_50.0_mumol/kg" | dose == "NaCl") %>%
-  select(id, position, Type, time, NOA, unique_id)  %>% 
-  filter(position == "Cortex")
-
-noa_50_s <- data_tidy %>% 
-  filter(dose == "CC_50.0_mumol/kg" | dose == "NaCl") %>%
-  select(id, position, Type, time, NOA, unique_id)  %>% 
-  filter(position == "Striatum")
-
-p1 <- ggplot(noa_50_a, aes(time, NOA, color = Type)) + 
-  geom_line(aes(group = id)) +
-  geom_point() + 
-  geom_vline(xintercept = DOSE_START, linetype = 2) + 
-  scale_color_manual(values = cbPalette[-1]) + 
-  labs(title = "NOA 50 a") + 
-  my_theme
-
-p2 <- ggplot(noa_50_s, aes(time, NOA, color = Type)) + 
-  geom_line(aes(group = id)) + 
-  geom_point() + 
-  geom_vline(xintercept = DOSE_START, linetype = 2) + 
-  scale_color_manual(values = cbPalette[-1]) + 
-  labs(title = "NOA 50 s") + 
-  my_theme
-
-ggpubr::ggarrange(p1, p2, ncol = 2)
-
-# cortex significant, bigger scale than s 
-# s-region nt significant
-
-# ------------------------------------------------------------------------------------------------
-# HT-5, case vs control dosages, 150 
-# ------------------------------------------------------------------------------------------------
-
-ht5_150_a <- data_tidy %>% 
-  filter(dose == "CC_150.0_mumol/kg" | dose == "NaCl") %>%
-  select(id, position, Type, time, HT_5, unique_id)  %>% 
-  filter(position == "Cortex")
-
-ht5_150_s <- data_tidy %>% 
-  filter(dose == "CC_150.0_mumol/kg" | dose == "NaCl") %>%
-  select(id, position, Type, time, HT_5, unique_id)  %>% 
-  filter(position == "Striatum")
-
-p1 <- ggplot(ht5_150_a, aes(time, HT_5, color = Type)) + 
-  geom_line(aes(group = id)) +
-  geom_point() + 
-  geom_vline(xintercept = DOSE_START, linetype = 2) + 
-  scale_color_manual(values = cbPalette[-1]) + 
-  labs(title = "HT-5 150 a") + 
-  my_theme
-
-p2 <- ggplot(ht5_150_s, aes(time, HT_5, color = Type)) + 
-  geom_line(aes(group = id)) + 
-  geom_point() + 
-  geom_vline(xintercept = 2, linetype = DOSE_START) + 
-  scale_color_manual(values = cbPalette[-1]) + 
-  labs(title = "HT-5 150 s") + 
-  my_theme
-
-ggpubr::ggarrange(p1, p2, ncol = 2)
-
-# signifcant cortex, same scale :) 
-# maybe significant for s-region 
-
-# ------------------------------------------------------------------------------------------------
-# HT-5, case vs control dosages, 150 
-# ------------------------------------------------------------------------------------------------
-
-ht5_50_a <- data_tidy %>% 
-  filter(dose == "CC_50.0_mumol/kg" | dose == "NaCl") %>%
-  select(id, position, Type, time, HT_5, unique_id)  %>% 
-  filter(position == "Cortex")
-
-ht5_50_s <- data_tidy %>% 
-  filter(dose == "CC_50.0_mumol/kg" | dose == "NaCl") %>%
-  select(id, position, Type, time, HT_5, unique_id)  %>% 
-  filter(position == "Striatum")
-
-p1 <- ggplot(ht5_50_a, aes(time, HT_5, color = Type)) + 
-  geom_line(aes(group = id)) +
-  geom_point() + 
-  geom_vline(xintercept = DOSE_START, linetype = 2) + 
-  scale_color_manual(values = cbPalette[-1]) + 
-  labs(title = "HT-5 50 a") + 
-  my_theme
-
-p2 <- ggplot(ht5_50_s, aes(time, HT_5, color = Type)) + 
-  geom_line(aes(group = id)) + 
-  geom_point() + 
-  geom_vline(xintercept = DOSE_START, linetype = 2) + 
-  scale_color_manual(values = cbPalette[-1]) + 
-  labs(title = "HT-5 50 s") + 
-  my_theme
-
-ggpubr::ggarrange(p1, p2, ncol = 2)
-
+# HT_5, case vs control dosages, CC50
+molecule <- "HT_5"
+dose <- "CC_50.0_mumol/kg"
+specie_name = "HT 5"; dose_name <- "CC 50"
+plot_individuals_non_scaled(data_tidy, molecule, dose, specie_name, dose_name)
 
 # ------------------------------------------------------------------------------------------------
 # DA, summarise 
