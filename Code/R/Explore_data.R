@@ -34,7 +34,13 @@ data_tidy <- read_csv(path_data, col_types = cols(
   HIAA = col_double(), 
   HVA = col_double(), 
   unique_id = col_factor(), 
-  dose = col_factor()))
+  dose = col_factor(), 
+  baseline_NOA = col_double(), 
+  baseline_DA = col_double(), 
+  baseline_HT_5 = col_double(), 
+  b_NOA = col_double(), 
+  b_DA = col_double(), 
+  b_HT_5 = col_double()))
 
 # Refactor dose (to make sense when plotting)
 dose_ordered <- fct_relevel(data_tidy$dose, "NaCl", after = 0) %>%
@@ -47,7 +53,7 @@ data_tidy$dose <- dose_ordered
 # ================================================================================================
 # Start of functions 
 # ================================================================================================
-# Function that wil for a certain dosage and molecule plot the time series for each individual. 
+# Function that will for a certain dosage and molecule plot the time series for each individual. 
 # Note that the data won't be scaled by baseline 
 # Args:
 #   data_tidy, the data set in tidy format 
@@ -92,7 +98,7 @@ plot_individuals_non_scaled <- function(data_tidy, specie, dose_input, specie_na
     labs(title = title, x = "Time [min]", y = specie) + 
     my_theme
   
-  ggpubr::ggarrange(p1, p2, ncol = 2)
+  ggpubr::ggarrange(p1, p2, ncol = 2, common.legend = T, legend = "bottom")
 }
 
 # Function that will plot summarised data for a certain spece. 
@@ -462,41 +468,7 @@ ggpubr::ggarrange(p1, p2, ncol = 2)
 # ---------------------------------------------------------------------------------------------
 # Fix base-line 
 # ---------------------------------------------------------------------------------------------
-unique_id_vec <- levels(data_tidy$unique_id)
-baseline_vec <- data.frame(matrix(0, nrow = length(unique_id_vec), ncol = 4))
-j <- 1
-for(i in 1:length(unique_id_vec)){
-  data <- data_tidy %>%
-    filter(unique_id == unique_id_vec[i])
-  
-  data <- data %>%
-    filter(time >= -40 & time <= 0) %>%
-    summarise(mean_val_NOA = mean(NOA, na.rm = T), 
-              mean_val_DA = mean(DA, na.rm = T), 
-              mean_val_HT_5 = mean(HT_5, na.rm = T))
-  baseline_vec[j, 1] <- as.numeric(data$mean_val_NOA)
-  baseline_vec[j, 2] <- as.numeric(data$mean_val_DA)
-  baseline_vec[j, 3] <- as.numeric(data$mean_val_HT_5)
-  baseline_vec[j, 4] <- unique_id_vec[i]
-  j <- j + 1
-}
 
-data_baseline <- tibble(baseline_NOA = as.numeric(baseline_vec[, 1]), 
-                        baseline_DA = as.numeric(baseline_vec[, 2]), 
-                        baseline_HT_5 = as.numeric(baseline_vec[, 3]), 
-                        unique_id = as.factor(baseline_vec[, 4])) 
-data_baseline$baseline_NOA[is.nan(data_baseline$baseline_NOA)] <- NA
-data_baseline$baseline_DA[is.nan(data_baseline$baseline_DA)] <- NA
-data_baseline$baseline_HT_5[is.nan(data_baseline$baseline_HT_5)] <- NA
-
-
-# Merge with the tidy data-set 
-test <- inner_join(data_tidy, data_baseline, by = "unique_id") %>%
-  mutate(unique_id = as.factor(unique_id)) %>%
-  mutate(b_NOA = NOA / baseline_NOA) %>%
-  mutate(b_DA = DA / baseline_DA) %>%
-  mutate(b_HT_5 =  HT_5 / baseline_HT_5) %>%
-  select(position, sample, Type, time, NOA, DA, HT_5, unique_id, b_NOA, b_DA, b_HT_5, dose)
 
 max(test$b_DA, na.rm = T)
 min(test$b_DA, na.rm = T)

@@ -310,7 +310,48 @@ data_tot <- case_data %>%
   bind_rows(control_data) %>%
   mutate_if(is.character, as.factor)
 
-# Save the data to the intermediate folder 
-path_save <- "../../Intermediate/Data_tidy.csv"
-write_csv(data_tot, path_save)
+# -------------------------------------------------------------------------------
+# Fix base-line data 
+# -------------------------------------------------------------------------------
+
+# Calculate the base-line for each sample
+unique_id_vec <- levels(data_tot$unique_id)
+baseline_vec <- data.frame(matrix(0, nrow = length(unique_id_vec), ncol = 4))
+j <- 1
+for(i in 1:length(unique_id_vec)){
+  data <- data_tot %>%
+    filter(unique_id == unique_id_vec[i])
   
+  data <- data %>%
+    filter(time >= -40 & time <= 0) %>%
+    summarise(mean_val_NOA = mean(NOA, na.rm = T), 
+              mean_val_DA = mean(DA, na.rm = T), 
+              mean_val_HT_5 = mean(HT_5, na.rm = T))
+  baseline_vec[j, 1] <- as.numeric(data$mean_val_NOA)
+  baseline_vec[j, 2] <- as.numeric(data$mean_val_DA)
+  baseline_vec[j, 3] <- as.numeric(data$mean_val_HT_5)
+  baseline_vec[j, 4] <- unique_id_vec[i]
+  j <- j + 1
+}
+
+# Add the baseline values in a tibble and convert NAN to NA 
+data_baseline <- tibble(baseline_NOA = as.numeric(baseline_vec[, 1]), 
+                        baseline_DA = as.numeric(baseline_vec[, 2]), 
+                        baseline_HT_5 = as.numeric(baseline_vec[, 3]), 
+                        unique_id = as.factor(baseline_vec[, 4])) 
+data_baseline$baseline_NOA[is.nan(data_baseline$baseline_NOA)] <- NA
+data_baseline$baseline_DA[is.nan(data_baseline$baseline_DA)] <- NA
+data_baseline$baseline_HT_5[is.nan(data_baseline$baseline_HT_5)] <- NA
+
+
+# Merge with the total data-set 
+data_big <- inner_join(data_tot, data_baseline, by = "unique_id") %>%
+  mutate(unique_id = as.factor(unique_id)) %>%
+  mutate(b_NOA = NOA / baseline_NOA) %>%
+  mutate(b_DA = DA / baseline_DA) %>%
+  mutate(b_HT_5 =  HT_5 / baseline_HT_5) 
+
+# Write the result to file 
+path_save <- "../../Intermediate/Data_tidy.csv"
+write_csv(data_big, path_save)
+
