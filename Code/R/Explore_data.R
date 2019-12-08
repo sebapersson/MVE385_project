@@ -97,7 +97,7 @@ plot_individuals_non_scaled <- function(data_tidy, specie, dose_input, specie_na
     geom_point() + 
     geom_vline(xintercept = DOSE_START, linetype = 2) + 
     scale_color_manual(values = cbPalette[-1]) + 
-    labs(title = title, x = "Time [min]", y = specie) + 
+    labs(title = title, x = "Time [min]", y = specie_name) + 
     my_theme
   
   ggpubr::ggarrange(p1, p2, ncol = 2, common.legend = T, legend = "bottom")
@@ -291,6 +291,9 @@ plot_dist_missing_values <- function(specie, specie_name)
 # Plotting over time for different indiviuals and different doses (and regions)
 # ================================================================================================
 
+# ------------------------------------------------------------------------------------------------
+# Dopamin
+# ------------------------------------------------------------------------------------------------
 # Dopamin, case vs control dosages, CC150 
 molecule <- "DA"
 dose <- "CC_150.0_mumol/kg"
@@ -304,6 +307,22 @@ specie_name = "Dopamin"; dose_name <- "CC 50"
 plot_individuals_non_scaled(data_tidy, molecule, dose, specie_name, dose_name)
 # Note DA:
 # Significant difference high dosage for cortex (bencmark test)
+
+# Dopamin baseline, case vs control dosages, CC150 
+molecule <- "b_DA"
+dose <- "CC_150.0_mumol/kg"
+specie_name = "Baseline Dopamin"; dose_name <- "CC 150"
+plot_individuals_non_scaled(data_tidy, molecule, dose, specie_name, dose_name)
+
+# Dopamin baseline, case vs control dosages, CC150 
+molecule <- "b_DA"
+dose <- "CC_50.0_mumol/kg"
+specie_name = "Baseline Dopamin"; dose_name <- "CC 50"
+plot_individuals_non_scaled(data_tidy, molecule, dose, specie_name, dose_name)
+
+# ------------------------------------------------------------------------------------------------
+# NOA 
+# ------------------------------------------------------------------------------------------------
 
 # NOA, case vs control dosages, CC150 
 molecule <- "NOA"
@@ -319,6 +338,22 @@ plot_individuals_non_scaled(data_tidy, molecule, dose, specie_name, dose_name)
 # Note NOA:
 # cortex significant, bigger scale than s, s-region not significant
 
+# NOA but baseline 
+molecule <- "b_NOA"
+dose <- "CC_150.0_mumol/kg"
+specie_name = "Basline NOA"; dose_name <- "CC 150"
+plot_individuals_non_scaled(data_tidy, molecule, dose, specie_name, dose_name)
+
+# NOA, case vs control dosages, CC50, baseline scaled 
+molecule <- "b_NOA"
+dose <- "CC_50.0_mumol/kg"
+specie_name = "Baseline NOA"; dose_name <- "CC 50"
+plot_individuals_non_scaled(data_tidy, molecule, dose, specie_name, dose_name)
+
+# ------------------------------------------------------------------------------------------------
+# HT-5
+# ------------------------------------------------------------------------------------------------
+
 # HT_5, case vs control dosages, CC150 
 molecule <- "HT_5"
 dose <- "CC_150.0_mumol/kg"
@@ -329,6 +364,18 @@ plot_individuals_non_scaled(data_tidy, molecule, dose, specie_name, dose_name)
 molecule <- "HT_5"
 dose <- "CC_50.0_mumol/kg"
 specie_name = "HT 5"; dose_name <- "CC 50"
+plot_individuals_non_scaled(data_tidy, molecule, dose, specie_name, dose_name)
+
+# HT_5, case vs control dosages, CC150 baseline 
+molecule <- "b_HT_5"
+dose <- "CC_150.0_mumol/kg"
+specie_name = "Baseline HT-5"; dose_name <- "CC 150"
+plot_individuals_non_scaled(data_tidy, molecule, dose, specie_name, dose_name)
+
+# HT_5, case vs control dosages, CC50 baseline 
+molecule <- "b_HT_5"
+dose <- "CC_50.0_mumol/kg"
+specie_name = "Baseline HT-5"; dose_name <- "CC 50"
 plot_individuals_non_scaled(data_tidy, molecule, dose, specie_name, dose_name)
 
 
