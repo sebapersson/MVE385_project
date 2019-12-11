@@ -74,7 +74,7 @@ plot_individuals_non_scaled <- function(data_tidy, specie, dose_input, specie_na
   
   data_150_s <- data_tidy %>% 
     filter(dose == dose_input | dose == "NaCl") %>%
-    select(id, position, Type, time, molecule, unique_id)  %>% 
+    select(id, position, Type, time, DA, unique_id)  %>% 
     filter(position == "Striatum")
   
   # Required by gg-plot in order to plot 
