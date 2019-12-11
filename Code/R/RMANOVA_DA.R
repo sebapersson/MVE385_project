@@ -45,7 +45,7 @@ specie="DA"
 # Calculate number of missing values 
 data_missing <- data_tidy %>%
   select(position, time, unique_id, specie) %>%
-  filter(time > -60) %>%
+  filter(time > 0) %>%
   filter(time != 200) 
 # For the tidyverse (and ggplot) to work
 names(data_missing)[4] <- "specie"
@@ -53,27 +53,14 @@ data_missing <- data_missing %>%
   group_by(unique_id) %>%
   summarise(number_na = sum(is.na(specie)))
 
-# The id if more (or equal) to 10 observations are missing 
-missing_many <- data_missing %>%
-  filter(number_na >= 10) %>%
-  select(unique_id)
-
 # The id if no observations are missing 
 data_no_missing <- data_missing %>%
   filter(number_na == 0) %>%
   select(unique_id)
 
-# Aggregate number of individuals with missing (but less than 10)
-data_with_missing <- data_tidy %>%
-  filter(time > -60 & time != 200) %>%
-  filter(!(unique_id %in% missing_many$unique_id)) %>%
-  mutate(time = as.factor(time)) %>%
-  group_by(dose, position) %>%
-  summarise(count = length(unique(unique_id)))
-
 # Aggreate number of samples with no missing 
 data_without_missing <- data_tidy %>%
-  filter(time > -60 & time != 200) %>%
+  filter(time > 0 & time != 200) %>%
   filter(unique_id %in% data_no_missing$unique_id) %>%
   mutate(time = as.factor(time)) %>%
   group_by(dose, position) %>%
@@ -93,7 +80,7 @@ data_without_missing <- data_tidy %>%
 #   ANOVA table and plot 
 RMANOVA_nontransformed_DA <- function(data_tidy, test_position, test_dose){
   data_tidy_RMANOVA_nontransformed<-data_tidy %>%
-    select(id, position, unique_id, time, DA, Type, dose) %>%
+    select(position, unique_id, time, DA, Type, dose) %>%
     mutate(time_cat = as.factor(time)) %>%
     filter(position == test_position) %>%
     filter(dose == 'NaCl' | dose == test_dose) %>%
