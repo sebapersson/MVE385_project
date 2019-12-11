@@ -1,5 +1,7 @@
 library(tidyverse)
 library(ez)
+library(afex)
+
 
 # General parameters for making good looking plots 
 my_theme <- theme_bw() + theme(plot.title = element_text(hjust = 0.5, size = 14, face="bold"), 
@@ -87,32 +89,48 @@ RMANOVA_nontransformed_DA <- function(data_tidy, test_position, test_dose){
     filter(time_cat == '20' | time_cat == '40'| time_cat == '60'| time_cat == '80' | time_cat == '100' | time_cat == '120' | time_cat == '140' | time_cat == '160' | time_cat == '180') %>%
     filter(unique_id %in% data_no_missing$unique_id)
   
-  ezDesign(data_tidy_RMANOVA_nontransformed,time_cat,Type)
-  
-  result_DA <- ezANOVA(
-    data_tidy_RMANOVA_nontransformed
-    , dv=.(DA)
-    , wid=.(unique_id)
-    , within=.(time_cat)
-    , between = .(Type)
+  result_DA <- ez.glm(
+    id="unique_id"
+    , dv="DA"
+    , data=data_tidy_RMANOVA_nontransformed
+    , between = "Type"
+    , within =  "time_cat"
     , type = 3
-    , detailed = FALSE
+    , return = "univariate"
+    , print.formula = TRUE
   )
   
-  
-  p1 <- ezPlot(data_tidy_RMANOVA_nontransformed
-    , dv=.(DA)
-    , wid=.(unique_id)
-    , within=.(time_cat)
-    , between = .(Type)
+  lm <- ez.glm(
+    id="unique_id"
+    , dv="DA"
+    , data=data_tidy_RMANOVA_nontransformed
+    , between = "Type"
+    , within =  "time_cat"
     , type = 3
-    , x=.(time_cat)
-    , x_lab='time'
-    , y_lab='Dopamin value'
-    , split=.(Type)
+    , return ="lm"
+    , print.formula = TRUE
   )
   
-  return(list(result_DA, p1))
+  nind=length(unique(data_tidy_RMANOVA_nontransformed$unique_id))
+  res <- tibble(res = as.numeric(lm$residuals)) %>%
+    mutate(time = rep(seq(from = 20, by = 20, to = 180), each = nind))
+  
+  title <- str_c("DA ", test_position, " ", test_dose)
+  p1 <- ggplot(res, aes(time, res)) + 
+    geom_point() + 
+    geom_hline(yintercept = 0) + 
+    geom_smooth(method = "loess", se = F, color = cbPalette[4], size = 1.2) +
+    labs(title = title , x = "time [min]", y = "residuals") +
+    my_theme
+  
+  title <- str_c("DA ", test_position, " ", test_dose)
+  p2 <- ggplot(res, aes(sample = res)) + 
+    geom_qq() + 
+    geom_qq_line() + 
+    labs(title = title) +
+    my_theme 
+  
+  return(list(result_DA, p1, p2))
 }
   
 
@@ -134,32 +152,48 @@ RMANOVA_transformed_DA <- function(data_tidy, test_position, test_dose){
     filter(time_cat == '20' | time_cat == '40'| time_cat == '60'| time_cat == '80' | time_cat == '100' | time_cat == '120' | time_cat == '140' | time_cat == '160' | time_cat == '180') %>%
     filter(unique_id %in% data_no_missing$unique_id)
   
-  ezDesign(data_tidy_RMANOVA_transformed,time_cat,Type)
-  
-  result_b_DA <- ezANOVA(
-    data_tidy_RMANOVA_transformed
-    , dv=.(b_DA)
-    , wid=.(unique_id)
-    , within=.(time_cat)
-    , between = .(Type)
+  result_b_DA <- ez.glm(
+    id="unique_id"
+    , dv="b_DA"
+    , data=data_tidy_RMANOVA_transformed
+    , between = "Type"
+    , within =  "time_cat"
     , type = 3
-    , detailed = FALSE
+    , return = "univariate"
+    , print.formula = TRUE
   )
   
-  
-  p1 <- ezPlot(data_tidy_RMANOVA_transformed
-               , dv=.(b_DA)
-               , wid=.(unique_id)
-               , within=.(time_cat)
-               , between = .(Type)
-               , type = 3
-               , x=.(time_cat)
-               , x_lab='time'
-               , y_lab='Dopamin baseline value'
-               , split=.(Type)
+  lm <- ez.glm(
+    id="unique_id"
+    , dv="b_DA"
+    , data=data_tidy_RMANOVA_transformed
+    , between = "Type"
+    , within =  "time_cat"
+    , type = 3
+    , return ="lm"
+    , print.formula = TRUE
   )
   
-  return(list(result_b_DA, p1))
+  nind=length(unique(data_tidy_RMANOVA_transformed$unique_id))
+  res <- tibble(res = as.numeric(lm$residuals)) %>%
+    mutate(time = rep(seq(from = 20, by = 20, to = 180), each = nind))
+  
+  title <- str_c("Baseline DA ", test_position, " ", test_dose)
+  p1 <- ggplot(res, aes(time, res)) + 
+    geom_point() + 
+    geom_hline(yintercept = 0) + 
+    geom_smooth(method = "loess", se = F, color = cbPalette[4], size = 1.2) +
+    labs(title = title, x = "time [min]", y = "residuals") +
+    my_theme
+  
+  title <- str_c("Baseline DA ", test_position, " ", test_dose)
+  p2 <- ggplot(res, aes(sample = res)) + 
+    geom_qq() + 
+    geom_qq_line() + 
+    labs(title = title) +
+    my_theme 
+  
+  return(list(result_b_DA, p1, p2))
 }
 
 # ================================================================================================
@@ -194,3 +228,4 @@ RMANOVA_transformed_DA(data_tidy, test_position="Cortex", test_dose="CC_150.0_mu
 RMANOVA_transformed_DA(data_tidy, test_position="Cortex", test_dose="CC_50.0_mumol/kg")    # significant, violated sphericity. Significant corrections
 RMANOVA_transformed_DA(data_tidy, test_position="Cortex", test_dose="CC_16.7_mumol/kg")    # time significant, violated sphericity. Significant corrections
 RMANOVA_transformed_DA(data_tidy, test_position="Cortex", test_dose="CC_5.6_mumol/kg")     # time significant, violated sphericity. Significant corrections
+
