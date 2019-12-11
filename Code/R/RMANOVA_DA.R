@@ -96,7 +96,7 @@ RMANOVA_nontransformed_DA <- function(data_tidy, test_position, test_dose){
     , within=.(time_cat)
     , between = .(Type)
     , type = 3
-    , detailed = TRUE
+    , detailed = FALSE
   )
   
   
@@ -143,7 +143,7 @@ RMANOVA_transformed_DA <- function(data_tidy, test_position, test_dose){
     , within=.(time_cat)
     , between = .(Type)
     , type = 3
-    , detailed = TRUE
+    , detailed = FALSE
   )
   
   
@@ -167,15 +167,16 @@ RMANOVA_transformed_DA <- function(data_tidy, test_position, test_dose){
 # ================================================================================================
 
 ### Striatum
-RMANOVA_nontransformed_DA(data_tidy, test_position="Striatum", test_dose="CC_150.0_mumol/kg") # This test only has 2 case subjects!
+RMANOVA_nontransformed_DA(data_tidy, test_position="Striatum", test_dose="CC_150.0_mumol/kg") # not significant
 RMANOVA_nontransformed_DA(data_tidy, test_position="Striatum", test_dose="CC_50.0_mumol/kg")  # not significant
-RMANOVA_nontransformed_DA(data_tidy, test_position="Striatum", test_dose="CC_16.7_mumol/kg")  # time significant, violated sphericity 
-RMANOVA_nontransformed_DA(data_tidy, test_position="Striatum", test_dose="CC_5.6_mumol/kg")   # time and Type significant, violated sphericity. One significant HF-correction
+RMANOVA_nontransformed_DA(data_tidy, test_position="Striatum", test_dose="CC_16.7_mumol/kg")  # not significant
+RMANOVA_nontransformed_DA(data_tidy, test_position="Striatum", test_dose="CC_5.6_mumol/kg")   # time significant, violated sphericity, significant corrections
+
 ### Cortex
-RMANOVA_nontransformed_DA(data_tidy, test_position="Cortex", test_dose="CC_150.0_mumol/kg")   # significant, violated sphericity. Significant corrections  ??
-RMANOVA_nontransformed_DA(data_tidy, test_position="Cortex", test_dose="CC_50.0_mumol/kg")    # significant, violated sphericity. Significant corrections  ??
-RMANOVA_nontransformed_DA(data_tidy, test_position="Cortex", test_dose="CC_16.7_mumol/kg")    # significant, violated sphericity. Significant corrections  ??
-RMANOVA_nontransformed_DA(data_tidy, test_position="Cortex", test_dose="CC_5.6_mumol/kg")     # time significant, violated sphericity. One GG and one HF correction significant  ??
+RMANOVA_nontransformed_DA(data_tidy, test_position="Cortex", test_dose="CC_150.0_mumol/kg")   # Type and time significant, violated sphericity. Significant corrections  
+RMANOVA_nontransformed_DA(data_tidy, test_position="Cortex", test_dose="CC_50.0_mumol/kg")    # Type and time significant, violated sphericity. Significant corrections  
+RMANOVA_nontransformed_DA(data_tidy, test_position="Cortex", test_dose="CC_16.7_mumol/kg")    # Type and time significant, violated sphericity. Significant corrections  
+RMANOVA_nontransformed_DA(data_tidy, test_position="Cortex", test_dose="CC_5.6_mumol/kg")     # time significant, violated sphericity. Significant corrections
 
 
 # ================================================================================================
@@ -184,19 +185,12 @@ RMANOVA_nontransformed_DA(data_tidy, test_position="Cortex", test_dose="CC_5.6_m
 
 ### Striatum
 RMANOVA_transformed_DA(data_tidy, test_position="Striatum", test_dose="CC_150.0_mumol/kg") # not significant
-RMANOVA_transformed_DA(data_tidy, test_position="Striatum", test_dose="CC_50.0_mumol/kg")  # time and Type significant, violated sphericity
-RMANOVA_transformed_DA(data_tidy, test_position="Striatum", test_dose="CC_16.7_mumol/kg")  # time significant, violated sphericity. One significant HF-correction  ??
-RMANOVA_transformed_DA(data_tidy, test_position="Striatum", test_dose="CC_5.6_mumol/kg")   # time significant, violated sphericity
+RMANOVA_transformed_DA(data_tidy, test_position="Striatum", test_dose="CC_50.0_mumol/kg")  # Type significant
+RMANOVA_transformed_DA(data_tidy, test_position="Striatum", test_dose="CC_16.7_mumol/kg")  # time significant, violated sphericity. Significant corrections   
+RMANOVA_transformed_DA(data_tidy, test_position="Striatum", test_dose="CC_5.6_mumol/kg")   # time significant, violated sphericity. Significant corrections
 
 ### Cortex
-RMANOVA_transformed_DA(data_tidy, test_position="Cortex", test_dose="CC_150.0_mumol/kg")   # significant, violated sphericity. Significant corrections  ??
-RMANOVA_transformed_DA(data_tidy, test_position="Cortex", test_dose="CC_50.0_mumol/kg")    # significant, violated sphericity. Significant corrections  ??
-RMANOVA_transformed_DA(data_tidy, test_position="Cortex", test_dose="CC_16.7_mumol/kg")    # time and interaction significant, violated sphericity. One GG, twp HF-corrections significant  ??
-RMANOVA_transformed_DA(data_tidy, test_position="Cortex", test_dose="CC_5.6_mumol/kg")     # time and Type significant, violated sphericity. One significant HF-correction  ??
-
-
-
-
-
-  
-
+RMANOVA_transformed_DA(data_tidy, test_position="Cortex", test_dose="CC_150.0_mumol/kg")   # significant, violated sphericity. Significant corrections
+RMANOVA_transformed_DA(data_tidy, test_position="Cortex", test_dose="CC_50.0_mumol/kg")    # significant, violated sphericity. Significant corrections
+RMANOVA_transformed_DA(data_tidy, test_position="Cortex", test_dose="CC_16.7_mumol/kg")    # time significant, violated sphericity. Significant corrections
+RMANOVA_transformed_DA(data_tidy, test_position="Cortex", test_dose="CC_5.6_mumol/kg")     # time significant, violated sphericity. Significant corrections
