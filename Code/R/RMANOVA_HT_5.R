@@ -130,7 +130,20 @@ RMANOVA_nontransformed_HT_5 <- function(data_tidy, test_position, test_dose){
     labs(title = title) +
     my_theme 
   
-  return(list(result_HT_5, p1, p2))
+  p3 <- ezPlot(data_tidy_RMANOVA_nontransformed
+               , dv=.(HT_5)
+               , wid=.(unique_id)
+               , within=.(time_cat)
+               , between = .(Type)
+               , type = 3
+               , x=.(time_cat)
+               , x_lab='time'
+               , y_lab='Serotonin value'
+               , split=.(Type)
+  )
+  
+  
+  return(list(result_HT_5, p1, p2,p3))
 }
   
 
@@ -193,7 +206,19 @@ RMANOVA_transformed_HT_5 <- function(data_tidy, test_position, test_dose){
     labs(title = title) +
     my_theme 
   
-  return(list(result_b_HT_5, p1, p2))
+  p3 <- ezPlot(data_tidy_RMANOVA_nontransformed
+               , dv=.(b_HT_5)
+               , wid=.(unique_id)
+               , within=.(time_cat)
+               , between = .(Type)
+               , type = 3
+               , x=.(time_cat)
+               , x_lab='time'
+               , y_lab='Serotonin value'
+               , split=.(Type)
+  )
+  
+  return(list(result_b_HT_5, p1, p2, p3))
 }
 
 # ================================================================================================
