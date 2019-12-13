@@ -1,6 +1,7 @@
 library(tidyverse)
 library(ez)
 library(afex)
+library(ggplot2)
 
 
 # General parameters for making good looking plots 
@@ -78,9 +79,10 @@ data_without_missing <- data_tidy %>%
 #   data_tidy, the data set in tidy format
 #   test_position, the brain region to be tested
 #   test_dose, the relevant dosage to be compared to control (NaCl)
+#   short_dose, test dose without decimal point (i.e. CC_150.0_mumol/kg -> 150)
 # Returns:
 #   ANOVA table and plot 
-RMANOVA_nontransformed_NOA <- function(data_tidy, test_position, test_dose){
+RMANOVA_nontransformed_NOA <- function(data_tidy, test_position, test_dose, short_dose){
   data_tidy_RMANOVA_nontransformed<-data_tidy %>%
     select(position, unique_id, time, NOA, Type, dose) %>%
     mutate(time_cat = as.factor(time)) %>%
@@ -115,6 +117,7 @@ RMANOVA_nontransformed_NOA <- function(data_tidy, test_position, test_dose){
   res <- tibble(res = as.numeric(lm$residuals)) %>%
     mutate(time = rep(seq(from = 20, by = 20, to = 180), each = nind))
   
+  # Currently not used
   title <- str_c("NOA ", test_position, " ", test_dose)
   p1 <- ggplot(res, aes(time, res)) + 
     geom_point() + 
@@ -125,15 +128,37 @@ RMANOVA_nontransformed_NOA <- function(data_tidy, test_position, test_dose){
   
   title <- str_c("NOA ", test_position, " ", test_dose)
   p2 <- ggplot(res, aes(sample = res)) + 
-    geom_qq() + 
+    geom_qq(colour=cbPalette[3]) + 
     geom_qq_line() + 
     labs(title = title) +
     my_theme 
   
-  return(list(result_NOA, p1, p2))
-}
+  p3 <- ezPlot(data_tidy_RMANOVA_nontransformed
+               , dv=.(NOA)
+               , wid=.(unique_id)
+               , within=.(time_cat)
+               , between = .(Type)
+               , type = 3
+               , x=.(time_cat)
+               , x_lab='time'
+               , y_lab='Norepinephrine value'
+               , split=.(Type)
+  )
   
-
+  # Saving plots:
+  path_save1 <- str_c("../../Result/qq_Noradrenalin_", test_position,"_", short_dose, ".jpg")
+  print(p2)
+  ggsave(filename = path_save1, plot = p2)
+  dev.off()
+  path_save2 <- str_c("../../Result/ez_Noradrenalin_", test_position,"_", short_dose, ".jpg")
+  print(p3)
+  ggsave(filename = path_save2, plot = p3)
+  dev.off()
+  
+  print(p2)
+  print(p3)
+  return(result_NOA)
+}
 
 # Function performing and plotting results from RMANOVA for  Norepinephrine at different dosages and 
 # positions for transformed (baseline) data. 
@@ -141,9 +166,10 @@ RMANOVA_nontransformed_NOA <- function(data_tidy, test_position, test_dose){
 #   data_tidy, the data set in tidy format
 #   test_position, the brain region to be tested
 #   test_dose, the relevant dosage to be compared to control (NaCl)
+#   short_dose, test dose without decimal point (i.e. CC_150.0_mumol/kg -> 150)
 # Returns:
 #   ANOVA table and plot 
-RMANOVA_transformed_NOA <- function(data_tidy, test_position, test_dose){
+RMANOVA_transformed_NOA <- function(data_tidy, test_position, test_dose, short_dose){
   data_tidy_RMANOVA_transformed<-data_tidy %>%
     select(id, position, unique_id, time, b_NOA, Type, dose) %>%
     mutate(time_cat = as.factor(time)) %>%
@@ -178,6 +204,7 @@ RMANOVA_transformed_NOA <- function(data_tidy, test_position, test_dose){
   res <- tibble(res = as.numeric(lm$residuals)) %>%
     mutate(time = rep(seq(from = 20, by = 20, to = 180), each = nind))
   
+  # Currently not used
   title <- str_c("Baseline NOA ", test_position, " ", test_dose)
   p1 <- ggplot(res, aes(time, res)) + 
     geom_point() + 
@@ -188,12 +215,37 @@ RMANOVA_transformed_NOA <- function(data_tidy, test_position, test_dose){
   
   title <- str_c("Baseline NOA ", test_position, " ", test_dose)
   p2 <- ggplot(res, aes(sample = res)) + 
-    geom_qq() + 
+    geom_qq(colour=cbPalette[3]) + 
     geom_qq_line() + 
     labs(title = title) +
     my_theme 
   
-  return(list(result_b_NOA, p1, p2))
+  p3 <- ezPlot(data_tidy_RMANOVA_transformed
+               , dv=.(b_NOA)
+               , wid=.(unique_id)
+               , within=.(time_cat)
+               , between = .(Type)
+               , type = 3
+               , x=.(time_cat)
+               , x_lab='time'
+               , y_lab='Baseline Norepinephrine value'
+               , split=.(Type)
+  )
+  
+  # Saving plots:
+  path_save1 <- str_c("../../Result/qq_Baseline_Noradrenalin_", test_position,"_", short_dose, ".jpg")
+  print(p2)
+  ggsave(filename = path_save1, plot = p2)
+  dev.off()
+  path_save2 <- str_c("../../Result/ez_Baseline_Noradrenalin_", test_position,"_", short_dose, ".jpg")
+  print(p3)
+  ggsave(filename = path_save2, plot = p3)
+  dev.off()
+  
+  print(p2)
+  print(p3)
+  
+  return(result_b_NOA)
 }
 
 # ================================================================================================
@@ -201,16 +253,16 @@ RMANOVA_transformed_NOA <- function(data_tidy, test_position, test_dose){
 # ================================================================================================
 
 ### Striatum
-RMANOVA_nontransformed_NOA(data_tidy, test_position="Striatum", test_dose="CC_150.0_mumol/kg") # not significant, fewer observations than within-factor levels
-RMANOVA_nontransformed_NOA(data_tidy, test_position="Striatum", test_dose="CC_50.0_mumol/kg")  # not significant, fewer observations than within-factor levels
-RMANOVA_nontransformed_NOA(data_tidy, test_position="Striatum", test_dose="CC_16.7_mumol/kg")  # time significant, violated sphericity, significant correction
-RMANOVA_nontransformed_NOA(data_tidy, test_position="Striatum", test_dose="CC_5.6_mumol/kg")   # time significant, violated sphericity, significant correction
+RMANOVA_nontransformed_NOA(data_tidy, test_position="Striatum", test_dose="CC_150.0_mumol/kg", short_dose = "150") # not significant, fewer observations than within-factor levels
+RMANOVA_nontransformed_NOA(data_tidy, test_position="Striatum", test_dose="CC_50.0_mumol/kg", short_dose = "50")  # not significant, fewer observations than within-factor levels
+RMANOVA_nontransformed_NOA(data_tidy, test_position="Striatum", test_dose="CC_16.7_mumol/kg", short_dose = "16")  # time significant, violated sphericity, significant correction
+RMANOVA_nontransformed_NOA(data_tidy, test_position="Striatum", test_dose="CC_5.6_mumol/kg", short_dose = "5")   # time significant, violated sphericity, significant correction
 
 ### Cortex
-RMANOVA_nontransformed_NOA(data_tidy, test_position="Cortex", test_dose="CC_150.0_mumol/kg")   # type and time significant, violated sphericity, significant correction  
-RMANOVA_nontransformed_NOA(data_tidy, test_position="Cortex", test_dose="CC_50.0_mumol/kg")    # type and time significant, violated sphericity, significant correction  
-RMANOVA_nontransformed_NOA(data_tidy, test_position="Cortex", test_dose="CC_16.7_mumol/kg")    # type and time significant
-RMANOVA_nontransformed_NOA(data_tidy, test_position="Cortex", test_dose="CC_5.6_mumol/kg")     # time significant
+RMANOVA_nontransformed_NOA(data_tidy, test_position="Cortex", test_dose="CC_150.0_mumol/kg", short_dose = "150")   # type and time significant, violated sphericity, significant correction  
+RMANOVA_nontransformed_NOA(data_tidy, test_position="Cortex", test_dose="CC_50.0_mumol/kg", short_dose = "50")    # type and time significant, violated sphericity, significant correction  
+RMANOVA_nontransformed_NOA(data_tidy, test_position="Cortex", test_dose="CC_16.7_mumol/kg", short_dose = "16")    # type and time significant
+RMANOVA_nontransformed_NOA(data_tidy, test_position="Cortex", test_dose="CC_5.6_mumol/kg", short_dose = "5")     # time significant
 
 
 # ================================================================================================
@@ -218,14 +270,14 @@ RMANOVA_nontransformed_NOA(data_tidy, test_position="Cortex", test_dose="CC_5.6_
 # ================================================================================================
 
 ### Striatum
-RMANOVA_transformed_NOA(data_tidy, test_position="Striatum", test_dose="CC_150.0_mumol/kg") # type significant, fewer observations than within-factor levels
-RMANOVA_transformed_NOA(data_tidy, test_position="Striatum", test_dose="CC_50.0_mumol/kg")  # fewer observations than within-factor levels
-RMANOVA_transformed_NOA(data_tidy, test_position="Striatum", test_dose="CC_16.7_mumol/kg")  # time significant, violated sphericity, significant correction   
-RMANOVA_transformed_NOA(data_tidy, test_position="Striatum", test_dose="CC_5.6_mumol/kg")   # time significant, violated sphericity
+RMANOVA_transformed_NOA(data_tidy, test_position="Striatum", test_dose="CC_150.0_mumol/kg", short_dose = "150") # type significant, fewer observations than within-factor levels
+RMANOVA_transformed_NOA(data_tidy, test_position="Striatum", test_dose="CC_50.0_mumol/kg", short_dose = "50")  # fewer observations than within-factor levels
+RMANOVA_transformed_NOA(data_tidy, test_position="Striatum", test_dose="CC_16.7_mumol/kg", short_dose = "16")  # time significant, violated sphericity, significant correction   
+RMANOVA_transformed_NOA(data_tidy, test_position="Striatum", test_dose="CC_5.6_mumol/kg", short_dose = "5")   # time significant, violated sphericity
 
 ### Cortex
-RMANOVA_transformed_NOA(data_tidy, test_position="Cortex", test_dose="CC_150.0_mumol/kg")   # type and time significant, violated sphericity, significant correction
-RMANOVA_transformed_NOA(data_tidy, test_position="Cortex", test_dose="CC_50.0_mumol/kg")    # type and time significant, violated sphericity, significant correction
-RMANOVA_transformed_NOA(data_tidy, test_position="Cortex", test_dose="CC_16.7_mumol/kg")    # type and time significant
-RMANOVA_transformed_NOA(data_tidy, test_position="Cortex", test_dose="CC_5.6_mumol/kg")     # time significant
+RMANOVA_transformed_NOA(data_tidy, test_position="Cortex", test_dose="CC_150.0_mumol/kg", short_dose = "150")   # type and time significant, violated sphericity, significant correction
+RMANOVA_transformed_NOA(data_tidy, test_position="Cortex", test_dose="CC_50.0_mumol/kg", short_dose = "50")    # type and time significant, violated sphericity, significant correction
+RMANOVA_transformed_NOA(data_tidy, test_position="Cortex", test_dose="CC_16.7_mumol/kg", short_dose = "16")    # type and time significant
+RMANOVA_transformed_NOA(data_tidy, test_position="Cortex", test_dose="CC_5.6_mumol/kg", short_dose = "5")     # time significant
 
