@@ -1,6 +1,7 @@
 library(tidyverse)
 library(ez)
 library(afex)
+library(ggplot2)
 
 
 # General parameters for making good looking plots 
@@ -78,9 +79,10 @@ data_without_missing <- data_tidy %>%
 #   data_tidy, the data set in tidy format
 #   test_position, the brain region to be tested
 #   test_dose, the relevant dosage to be compared to control (NaCl)
+#   short_dose, test dose without decimal point (i.e. CC_150.0_mumol/kg -> 150)
 # Returns:
 #   ANOVA table and plot 
-RMANOVA_nontransformed_HT_5 <- function(data_tidy, test_position, test_dose){
+RMANOVA_nontransformed_HT_5 <- function(data_tidy, test_position, test_dose, short_dose){
   data_tidy_RMANOVA_nontransformed<-data_tidy %>%
     select(position, unique_id, time, HT_5, Type, dose) %>%
     mutate(time_cat = as.factor(time)) %>%
@@ -115,6 +117,7 @@ RMANOVA_nontransformed_HT_5 <- function(data_tidy, test_position, test_dose){
   res <- tibble(res = as.numeric(lm$residuals)) %>%
     mutate(time = rep(seq(from = 20, by = 20, to = 180), each = nind))
   
+  # Currently not used
   title <- str_c("5-HT ", test_position, " ", test_dose)
   p1 <- ggplot(res, aes(time, res)) + 
     geom_point() + 
@@ -125,7 +128,7 @@ RMANOVA_nontransformed_HT_5 <- function(data_tidy, test_position, test_dose){
   
   title <- str_c("5-HT ", test_position, " ", test_dose)
   p2 <- ggplot(res, aes(sample = res)) + 
-    geom_qq() + 
+    geom_qq(colour=cbPalette[3]) + 
     geom_qq_line() + 
     labs(title = title) +
     my_theme 
@@ -142,11 +145,20 @@ RMANOVA_nontransformed_HT_5 <- function(data_tidy, test_position, test_dose){
                , split=.(Type)
   )
   
+  # Saving plots:
+  path_save1 <- str_c("../../Result/qq_Serotonin_", test_position,"_", short_dose, ".jpg")
+  print(p2)
+  ggsave(filename = path_save1, plot = p2)
+  dev.off()
+  path_save2 <- str_c("../../Result/ez_Serotonin_", test_position,"_", short_dose, ".jpg")
+  print(p3)
+  ggsave(filename = path_save2, plot = p3)
+  dev.off()
   
-  return(list(result_HT_5, p1, p2,p3))
+  print(p2)
+  print(p3)
+  return(result_HT_5)
 }
-  
-
 
 # Function performing and plotting results from RMANOVA for Serotonin at different dosages and 
 # positions for transformed (baseline) data. 
@@ -154,9 +166,10 @@ RMANOVA_nontransformed_HT_5 <- function(data_tidy, test_position, test_dose){
 #   data_tidy, the data set in tidy format
 #   test_position, the brain region to be tested
 #   test_dose, the relevant dosage to be compared to control (NaCl)
+#   short_dose, test dose without decimal point (i.e. CC_150.0_mumol/kg -> 150)
 # Returns:
 #   ANOVA table and plot 
-RMANOVA_transformed_HT_5 <- function(data_tidy, test_position, test_dose){
+RMANOVA_transformed_HT_5 <- function(data_tidy, test_position, test_dose, short_dose){
   data_tidy_RMANOVA_transformed<-data_tidy %>%
     select(id, position, unique_id, time, b_HT_5, Type, dose) %>%
     mutate(time_cat = as.factor(time)) %>%
@@ -191,6 +204,7 @@ RMANOVA_transformed_HT_5 <- function(data_tidy, test_position, test_dose){
   res <- tibble(res = as.numeric(lm$residuals)) %>%
     mutate(time = rep(seq(from = 20, by = 20, to = 180), each = nind))
   
+  # Currently not used
   title <- str_c("Baseline 5-HT ", test_position, " ", test_dose)
   p1 <- ggplot(res, aes(time, res)) + 
     geom_point() + 
@@ -201,12 +215,12 @@ RMANOVA_transformed_HT_5 <- function(data_tidy, test_position, test_dose){
   
   title <- str_c("Baseline 5-HT ", test_position, " ", test_dose)
   p2 <- ggplot(res, aes(sample = res)) + 
-    geom_qq() + 
+    geom_qq(colour=cbPalette[3]) + 
     geom_qq_line() + 
     labs(title = title) +
     my_theme 
   
-  p3 <- ezPlot(data_tidy_RMANOVA_nontransformed
+  p3 <- ezPlot(data_tidy_RMANOVA_transformed
                , dv=.(b_HT_5)
                , wid=.(unique_id)
                , within=.(time_cat)
@@ -214,11 +228,24 @@ RMANOVA_transformed_HT_5 <- function(data_tidy, test_position, test_dose){
                , type = 3
                , x=.(time_cat)
                , x_lab='time'
-               , y_lab='Serotonin value'
+               , y_lab='Baseline Serotonin value'
                , split=.(Type)
   )
   
-  return(list(result_b_HT_5, p1, p2, p3))
+  # Saving plots:
+  path_save1 <- str_c("../../Result/qq_Baseline_Serotonin_", test_position,"_", short_dose, ".jpg")
+  print(p2)
+  ggsave(filename = path_save1, plot = p2)
+  dev.off()
+  path_save2 <- str_c("../../Result/ez_Baseline_Serotonin_", test_position,"_", short_dose, ".jpg")
+  print(p3)
+  ggsave(filename = path_save2, plot = p3)
+  dev.off()
+  
+  print(p2)
+  print(p3)
+  
+  return(result_b_HT_5)
 }
 
 # ================================================================================================
@@ -226,29 +253,29 @@ RMANOVA_transformed_HT_5 <- function(data_tidy, test_position, test_dose){
 # ================================================================================================
 
 ### Striatum
-RMANOVA_nontransformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_150.0_mumol/kg") # Type and time significant, violated sphericity, significant corrections
-RMANOVA_nontransformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_50.0_mumol/kg")  # not significant
-RMANOVA_nontransformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_16.7_mumol/kg")  # time significant, violated sphericity, significant corrections
-RMANOVA_nontransformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_5.6_mumol/kg")   # not significant
+RMANOVA_nontransformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_150.0_mumol/kg", short_dose = "150") # Type and time significant, violated sphericity, significant corrections
+RMANOVA_nontransformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_50.0_mumol/kg", short_dose = "50")  # not significant
+RMANOVA_nontransformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_16.7_mumol/kg", short_dose = "16")  # time significant, violated sphericity, significant corrections
+RMANOVA_nontransformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_5.6_mumol/kg", short_dose = "5")   # not significant
 
 ### Cortex
-RMANOVA_nontransformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_150.0_mumol/kg")   # Type significant
-RMANOVA_nontransformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_50.0_mumol/kg")    # Type and time significant, violated sphericity. Significant corrections  
-RMANOVA_nontransformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_16.7_mumol/kg")    # Type and time significant, violated sphericity. Cannot correct due to too few observations
-RMANOVA_nontransformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_5.6_mumol/kg")     # Type significant
+RMANOVA_nontransformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_150.0_mumol/kg", short_dose = "150")   # Type significant
+RMANOVA_nontransformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_50.0_mumol/kg", short_dose = "50")    # Type and time significant, violated sphericity. Significant corrections  
+RMANOVA_nontransformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_16.7_mumol/kg", short_dose = "16")    # Type and time significant, violated sphericity. Cannot correct due to too few observations
+RMANOVA_nontransformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_5.6_mumol/kg", short_dose = "5")     # Type significant
 
 # ================================================================================================
 # Results transformed Serotonin (b_HT_5)
 # ================================================================================================
 
 ### Striatum
-RMANOVA_transformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_150.0_mumol/kg") # Type significant
-RMANOVA_transformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_50.0_mumol/kg")  # Type significant
-RMANOVA_transformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_16.7_mumol/kg")  # not significant 
-RMANOVA_transformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_5.6_mumol/kg")   # not significant
+RMANOVA_transformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_150.0_mumol/kg", short_dose = "150") # Type significant
+RMANOVA_transformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_50.0_mumol/kg", short_dose = "50")  # Type significant
+RMANOVA_transformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_16.7_mumol/kg", short_dose = "16")  # not significant 
+RMANOVA_transformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_5.6_mumol/kg", short_dose = "5")   # not significant
 
 ### Cortex
-RMANOVA_transformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_150.0_mumol/kg")   # Type significant
-RMANOVA_transformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_50.0_mumol/kg")    # Type and time significant, violated sphericity. Significant corrections
-RMANOVA_transformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_16.7_mumol/kg")    # time significant, violated sphericity. cannot correct due to too few observations
-RMANOVA_transformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_5.6_mumol/kg")     # not significant
+RMANOVA_transformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_150.0_mumol/kg", short_dose = "150")   # Type significant
+RMANOVA_transformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_50.0_mumol/kg", short_dose = "50")    # Type and time significant, violated sphericity. Significant corrections
+RMANOVA_transformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_16.7_mumol/kg", short_dose = "16")    # time significant, violated sphericity. cannot correct due to too few observations
+RMANOVA_transformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_5.6_mumol/kg", short_dose = "5")     # not significant
