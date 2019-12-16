@@ -146,6 +146,16 @@ RMANOVA_nontransformed_NOA <- function(data_tidy, test_position, test_dose, shor
                , split=.(Type)
   )
   
+  # Creating table
+  pvalue<-result_NOA$univariate.tests[-1,6]
+  Sphericity<-c(NA,result_NOA$sphericity.tests[,2])
+  GG_pvalue<-c(NA,result_NOA$pval.adjustments[,2])
+  Factor<-c("Treatment", "Time", "Interaction")
+  table_NOA<-data.frame(Factor,pvalue,Sphericity,GG_pvalue)
+  title <- str_c("NOA ", test_position, " ",short_dose, " mumol/kg")
+  row.names(table_NOA)<-c(title, "", " ")
+  print(xtable(table_NOA))
+  
   # Saving plots:
   if(save_plot == TRUE){
   path_save1 <- str_c("../../Result/qq_Noradrenalin_", test_position,"_", short_dose, ".pdf")
@@ -160,7 +170,7 @@ RMANOVA_nontransformed_NOA <- function(data_tidy, test_position, test_dose, shor
   print(p2)
   print(p3)
   }
-  return(result_NOA)
+  return(table_NOA) #return result_NOA for detailed table
 }
 
 # Function performing and plotting results from RMANOVA for  Norepinephrine at different dosages and 
@@ -236,6 +246,16 @@ RMANOVA_transformed_NOA <- function(data_tidy, test_position, test_dose, short_d
                , split=.(Type)
   )
   
+  # Creating table
+  pvalue<-result_b_NOA$univariate.tests[-1,6]
+  Sphericity<-c(NA,result_b_NOA$sphericity.tests[,2])
+  GG_pvalue<-c(NA,result_b_NOA$pval.adjustments[,2])
+  Factor<-c("Treatment", "Time", "Interaction")
+  table_b_NOA<-data.frame(Factor,pvalue,Sphericity,GG_pvalue)
+  title <- str_c("Baseline NOA ", test_position, " ",short_dose, " mumol/kg")
+  row.names(table_b_NOA)<-c(title, "", " ")
+  print(xtable(table_b_NOA))
+  
   # Saving plots:
   if(save_plot == TRUE){
   path_save1 <- str_c("../../Result/qq_Baseline_Noradrenalin_", test_position,"_", short_dose, ".pdf")
@@ -250,7 +270,7 @@ RMANOVA_transformed_NOA <- function(data_tidy, test_position, test_dose, short_d
   print(p2)
   print(p3)
   }
-  return(result_b_NOA)
+  return(table_b_NOA) # return result_b_NOA for detailed table
 }
 
 # ================================================================================================
