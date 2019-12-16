@@ -2,6 +2,7 @@ library(tidyverse)
 library(ez)
 library(afex)
 library(ggplot2)
+library(xtable)
 
 
 # General parameters for making good looking plots 
@@ -146,6 +147,16 @@ RMANOVA_nontransformed_DA <- function(data_tidy, test_position, test_dose, short
                , split=.(Type)
   )
   
+  # Creating table
+  pvalue<-result_DA$univariate.tests[-1,6]
+  Sphericity<-c(NA,result_DA$sphericity.tests[,2])
+  GG_pvalue<-c(NA,result_DA$pval.adjustments[,2])
+  Factor<-c("Treatment", "Time", "Interaction")
+  table_DA<-data.frame(Factor,pvalue,Sphericity,GG_pvalue)
+  title <- str_c("DA ", test_position, " ",short_dose, " mumol/kg")
+  row.names(table_DA)<-c(title, "", " ")
+  print(xtable(table_DA))
+  
   # Saving plots:
   if(save_plot == TRUE){
   path_save1 <- str_c("../../Result/qq_Dopamin_", test_position,"_", short_dose, ".pdf")
@@ -160,7 +171,8 @@ RMANOVA_nontransformed_DA <- function(data_tidy, test_position, test_dose, short
   print(p2)
   print(p3)
   }
-  return(result_DA)
+  
+  return(table_DA) # print result_DA for detailed table
 }
 
 # Function performing and plotting results from RMANOVA for Dopamin at different dosages and 
@@ -235,6 +247,17 @@ RMANOVA_transformed_DA <- function(data_tidy, test_position, test_dose, short_do
                , y_lab='Baseline Dopamin value'
                , split=.(Type)
   )
+  
+  # Creating table:
+  pvalue<-result_b_DA$univariate.tests[-1,6]
+  Sphericity<-c(NA,result_b_DA$sphericity.tests[,2])
+  GG_pvalue<-c(NA,result_b_DA$pval.adjustments[,2])
+  Factor<-c("Treatment", "Time", "Interaction")
+  table_b_DA<-data.frame(Factor,pvalue,Sphericity,GG_pvalue)
+  title <- str_c("Baseline DA ", test_position, " ",short_dose, " mumol/kg")
+  row.names(table_b_DA)<-c(title, "", " ")
+  print(xtable(table_b_DA))
+  
   # Saving plots:
   if(save_plot == TRUE){
   path_save1 <- str_c("../../Result/qq_Baseline_Dopamin_", test_position,"_", short_dose, ".pdf")
@@ -249,7 +272,8 @@ RMANOVA_transformed_DA <- function(data_tidy, test_position, test_dose, short_do
   print(p2)
   print(p3)
   }
-  return(result_b_DA)
+  
+  return(table_b_DA) # print result_b_DA for detailed table
 }
 
 # ================================================================================================
@@ -284,4 +308,3 @@ RMANOVA_transformed_DA(data_tidy, test_position="Cortex", test_dose="CC_150.0_mu
 RMANOVA_transformed_DA(data_tidy, test_position="Cortex", test_dose="CC_50.0_mumol/kg", short_dose = "50", save_plot=FALSE)    # significant, violated sphericity. Significant corrections
 RMANOVA_transformed_DA(data_tidy, test_position="Cortex", test_dose="CC_16.7_mumol/kg", short_dose = "16", save_plot=TRUE)    # time significant, violated sphericity. Significant corrections
 RMANOVA_transformed_DA(data_tidy, test_position="Cortex", test_dose="CC_5.6_mumol/kg", short_dose = "5", save_plot=TRUE)     # time significant, violated sphericity. Significant corrections
-
