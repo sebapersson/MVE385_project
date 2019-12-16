@@ -146,6 +146,20 @@ RMANOVA_nontransformed_HT_5 <- function(data_tidy, test_position, test_dose, sho
                , split=.(Type)
   )
   
+  # Creating table
+  pvalue<-result_HT_5$univariate.tests[-1,6]
+  Sphericity<-c(NA,result_HT_5$sphericity.tests[,2])
+  GG_pvalue<-c(NA,result_HT_5$pval.adjustments[,2])
+  if(test_position=="Cortex" && test_dose=="CC_16.7_mumol/kg" && short_dose == "16"){
+    Sphericity<-c(NA,"-", "-")
+    GG_pvalue<-c(NA, "-", "-")
+  }
+  Factor<-c("Treatment", "Time", "Interaction")
+  table_HT_5<-data.frame(Factor,pvalue,Sphericity,GG_pvalue)
+  title <- str_c("5-HT ", test_position, " ",short_dose, " mumol/kg")
+  row.names(table_HT_5)<-c(title, "", " ")
+  print(xtable(table_HT_5))
+  
   # Saving plots:
   if(save_plot == TRUE){
   path_save1 <- str_c("../../Result/qq_Serotonin_", test_position,"_", short_dose, ".pdf")
@@ -160,7 +174,7 @@ RMANOVA_nontransformed_HT_5 <- function(data_tidy, test_position, test_dose, sho
   print(p2)
   print(p3)
   }
-  return(result_HT_5)
+  return(table_HT_5) # return results_HT_5 for detailed table
 }
 
 # Function performing and plotting results from RMANOVA for Serotonin at different dosages and 
@@ -236,6 +250,20 @@ RMANOVA_transformed_HT_5 <- function(data_tidy, test_position, test_dose, short_
                , split=.(Type)
   )
   
+  # Creating table
+  pvalue<-result_b_HT_5$univariate.tests[-1,6]
+  Sphericity<-c(NA,result_b_HT_5$sphericity.tests[,2])
+  GG_pvalue<-c(NA,result_b_HT_5$pval.adjustments[,2])
+  if(test_position=="Cortex" && test_dose=="CC_16.7_mumol/kg" && short_dose == "16"){
+    Sphericity<-c(NA,"-", "-")
+    GG_pvalue<-c(NA, "-", "-")
+  }
+  Factor<-c("Treatment", "Time", "Interaction")
+  table_b_HT_5<-data.frame(Factor,pvalue,Sphericity,GG_pvalue)
+  title <- str_c("Baseline 5-HT ", test_position, " ",short_dose, " mumol/kg")
+  row.names(table_b_HT_5)<-c(title, "", " ")
+  print(xtable(table_b_HT_5))
+
   # Saving plots:
   if(save_plot == TRUE){
   path_save1 <- str_c("../../Result/qq_Baseline_Serotonin_", test_position,"_", short_dose, ".pdf")
@@ -250,7 +278,7 @@ RMANOVA_transformed_HT_5 <- function(data_tidy, test_position, test_dose, short_
   print(p2)
   print(p3)
   }
-  return(result_b_HT_5)
+  return(table_b_HT_5) #return result_b_HT_5 for detailed table
 }
 
 # ================================================================================================
@@ -258,29 +286,29 @@ RMANOVA_transformed_HT_5 <- function(data_tidy, test_position, test_dose, short_
 # ================================================================================================
 
 ### Striatum
-RMANOVA_nontransformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_150.0_mumol/kg", short_dose = "150", save_plot=FALSE) # Type and time significant, violated sphericity, significant corrections
+RMANOVA_nontransformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_150.0_mumol/kg", short_dose = "150", save_plot=TRUE) # Type and time significant, violated sphericity, significant corrections
 RMANOVA_nontransformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_50.0_mumol/kg", short_dose = "50", save_plot=FALSE)  # not significant
-RMANOVA_nontransformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_16.7_mumol/kg", short_dose = "16", save_plot=FALSE)  # time significant, violated sphericity, significant corrections
+RMANOVA_nontransformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_16.7_mumol/kg", short_dose = "16", save_plot=TRUE)  # time significant, violated sphericity, significant corrections
 RMANOVA_nontransformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_5.6_mumol/kg", short_dose = "5", save_plot=FALSE)   # not significant
 
 ### Cortex
-RMANOVA_nontransformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_150.0_mumol/kg", short_dose = "150", save_plot=FALSE)   # Type significant
-RMANOVA_nontransformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_50.0_mumol/kg", short_dose = "50", save_plot=FALSE)    # Type and time significant, violated sphericity. Significant corrections  
-RMANOVA_nontransformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_16.7_mumol/kg", short_dose = "16", save_plot=FALSE)    # Type and time significant, violated sphericity. Cannot correct due to too few observations
-RMANOVA_nontransformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_5.6_mumol/kg", short_dose = "5", save_plot=FALSE)     # Type significant
+RMANOVA_nontransformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_150.0_mumol/kg", short_dose = "150", save_plot=TRUE)   # Type significant
+RMANOVA_nontransformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_50.0_mumol/kg", short_dose = "50", save_plot=TRUE)    # Type and time significant, violated sphericity. Significant corrections  
+RMANOVA_nontransformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_16.7_mumol/kg", short_dose = "16", save_plot=TRUE)    # Type and time significant, violated sphericity. Cannot correct due to too few observations
+RMANOVA_nontransformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_5.6_mumol/kg", short_dose = "5", save_plot=TRUE)     # Type significant
 
 # ================================================================================================
 # Results transformed Serotonin (b_HT_5)
 # ================================================================================================
 
 ### Striatum
-RMANOVA_transformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_150.0_mumol/kg", short_dose = "150", save_plot=FALSE) # Type significant
-RMANOVA_transformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_50.0_mumol/kg", short_dose = "50", save_plot=FALSE)  # Type significant
+RMANOVA_transformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_150.0_mumol/kg", short_dose = "150", save_plot=TRUE) # Type significant
+RMANOVA_transformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_50.0_mumol/kg", short_dose = "50", save_plot=TRUE)  # Type significant
 RMANOVA_transformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_16.7_mumol/kg", short_dose = "16", save_plot=FALSE)  # not significant 
 RMANOVA_transformed_HT_5(data_tidy, test_position="Striatum", test_dose="CC_5.6_mumol/kg", short_dose = "5", save_plot=FALSE)   # not significant
 
 ### Cortex
-RMANOVA_transformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_150.0_mumol/kg", short_dose = "150", save_plot=FALSE)   # Type significant
-RMANOVA_transformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_50.0_mumol/kg", short_dose = "50", save_plot=FALSE)    # Type and time significant, violated sphericity. Significant corrections
-RMANOVA_transformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_16.7_mumol/kg", short_dose = "16", save_plot=FALSE)    # time significant, violated sphericity. cannot correct due to too few observations
+RMANOVA_transformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_150.0_mumol/kg", short_dose = "150", save_plot=TRUE)   # Type significant
+RMANOVA_transformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_50.0_mumol/kg", short_dose = "50", save_plot=TRUE)    # Type and time significant, violated sphericity. Significant corrections
+RMANOVA_transformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_16.7_mumol/kg", short_dose = "16", save_plot=TRUE)    # time significant, violated sphericity. cannot correct due to too few observations
 RMANOVA_transformed_HT_5(data_tidy, test_position="Cortex", test_dose="CC_5.6_mumol/kg", short_dose = "5", save_plot=FALSE)     # not significant
