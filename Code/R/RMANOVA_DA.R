@@ -260,13 +260,13 @@ RMANOVA_transformed_DA <- function(data_tidy, test_position, test_dose, short_do
 RMANOVA_nontransformed_DA(data_tidy, test_position="Striatum", test_dose="CC_150.0_mumol/kg", short_dose = "150", save_plot=FALSE) # not significant
 RMANOVA_nontransformed_DA(data_tidy, test_position="Striatum", test_dose="CC_50.0_mumol/kg", short_dose = "50", save_plot=FALSE)  # not significant
 RMANOVA_nontransformed_DA(data_tidy, test_position="Striatum", test_dose="CC_16.7_mumol/kg", short_dose = "16", save_plot=FALSE)  # not significant
-RMANOVA_nontransformed_DA(data_tidy, test_position="Striatum", test_dose="CC_5.6_mumol/kg", short_dose = "5", save_plot=FALSE)   # time significant, violated sphericity, significant corrections
+RMANOVA_nontransformed_DA(data_tidy, test_position="Striatum", test_dose="CC_5.6_mumol/kg", short_dose = "5", save_plot=TRUE)   # time significant, violated sphericity, significant corrections
 
 ### Cortex
-RMANOVA_nontransformed_DA(data_tidy, test_position="Cortex", test_dose="CC_150.0_mumol/kg", short_dose = "150", save_plot=FALSE)   # Type and time significant, violated sphericity. Significant corrections  
-RMANOVA_nontransformed_DA(data_tidy, test_position="Cortex", test_dose="CC_50.0_mumol/kg", short_dose = "50", save_plot=FALSE)    # Type and time significant, violated sphericity. Significant corrections  
-RMANOVA_nontransformed_DA(data_tidy, test_position="Cortex", test_dose="CC_16.7_mumol/kg", short_dose = "16", save_plot=FALSE)    # Type and time significant, violated sphericity. Significant corrections  
-RMANOVA_nontransformed_DA(data_tidy, test_position="Cortex", test_dose="CC_5.6_mumol/kg", short_dose = "5", save_plot=FALSE)     # time significant, violated sphericity. Significant corrections
+RMANOVA_nontransformed_DA(data_tidy, test_position="Cortex", test_dose="CC_150.0_mumol/kg", short_dose = "150", save_plot=TRUE)   # Type and time significant, violated sphericity. Significant corrections  
+RMANOVA_nontransformed_DA(data_tidy, test_position="Cortex", test_dose="CC_50.0_mumol/kg", short_dose = "50", save_plot=TRUE)    # Type and time significant, violated sphericity. Significant corrections  
+RMANOVA_nontransformed_DA(data_tidy, test_position="Cortex", test_dose="CC_16.7_mumol/kg", short_dose = "16", save_plot=TRUE)    # Type and time significant, violated sphericity. Significant corrections  
+RMANOVA_nontransformed_DA(data_tidy, test_position="Cortex", test_dose="CC_5.6_mumol/kg", short_dose = "5", save_plot=TRUE)     # time significant, violated sphericity. Significant corrections
 
 
 # ================================================================================================
@@ -275,13 +275,13 @@ RMANOVA_nontransformed_DA(data_tidy, test_position="Cortex", test_dose="CC_5.6_m
 
 ### Striatum
 RMANOVA_transformed_DA(data_tidy, test_position="Striatum", test_dose="CC_150.0_mumol/kg", short_dose = "150", save_plot=FALSE) # not significant
-RMANOVA_transformed_DA(data_tidy, test_position="Striatum", test_dose="CC_50.0_mumol/kg", short_dose = "50", save_plot=FALSE)  # Type significant
-RMANOVA_transformed_DA(data_tidy, test_position="Striatum", test_dose="CC_16.7_mumol/kg", short_dose = "16", save_plot=FALSE)  # time significant, violated sphericity. Significant corrections   
-RMANOVA_transformed_DA(data_tidy, test_position="Striatum", test_dose="CC_5.6_mumol/kg", short_dose = "5", save_plot=FALSE)   # time significant, violated sphericity. Significant corrections
+RMANOVA_transformed_DA(data_tidy, test_position="Striatum", test_dose="CC_50.0_mumol/kg", short_dose = "50", save_plot=TRUE)  # Type significant
+RMANOVA_transformed_DA(data_tidy, test_position="Striatum", test_dose="CC_16.7_mumol/kg", short_dose = "16", save_plot=TRUE)  # time significant, violated sphericity. Significant corrections   
+RMANOVA_transformed_DA(data_tidy, test_position="Striatum", test_dose="CC_5.6_mumol/kg", short_dose = "5", save_plot=TRUE)   # time significant, violated sphericity. Significant corrections
 
 ### Cortex
 RMANOVA_transformed_DA(data_tidy, test_position="Cortex", test_dose="CC_150.0_mumol/kg", short_dose = "150", save_plot=FALSE)   # significant, violated sphericity. Significant corrections
 RMANOVA_transformed_DA(data_tidy, test_position="Cortex", test_dose="CC_50.0_mumol/kg", short_dose = "50", save_plot=FALSE)    # significant, violated sphericity. Significant corrections
-RMANOVA_transformed_DA(data_tidy, test_position="Cortex", test_dose="CC_16.7_mumol/kg", short_dose = "16", save_plot=FALSE)    # time significant, violated sphericity. Significant corrections
-RMANOVA_transformed_DA(data_tidy, test_position="Cortex", test_dose="CC_5.6_mumol/kg", short_dose = "5", save_plot=FALSE)     # time significant, violated sphericity. Significant corrections
+RMANOVA_transformed_DA(data_tidy, test_position="Cortex", test_dose="CC_16.7_mumol/kg", short_dose = "16", save_plot=TRUE)    # time significant, violated sphericity. Significant corrections
+RMANOVA_transformed_DA(data_tidy, test_position="Cortex", test_dose="CC_5.6_mumol/kg", short_dose = "5", save_plot=TRUE)     # time significant, violated sphericity. Significant corrections
 
